@@ -1,3 +1,0 @@
-This is my first message for Git repo!!
-
-This is my second message for Git repo...
