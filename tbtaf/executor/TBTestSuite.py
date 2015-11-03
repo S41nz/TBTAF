@@ -10,8 +10,8 @@ class TBTestSuite:
         return "Test case added"
     
     def getTestCases(self):
-        '''This should return a TBTestCase[], but I don't have the class yet'''
-        return "An array of TBTestCase"
+        result = [TBTestCase(), TBTestCase()]
+        return result
     
     def getSuiteTrace(self):
         '''Array of TBTAFTrace'''
