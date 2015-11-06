@@ -38,13 +38,48 @@ class TBTAFOrchestrator(object):
 			#urlList = "localhost"
 		
 		#Initialize TBTestBed
-		TBTestBed tBtestBedInstance
-		
-		return tBtestBedInstance
-    
+		#TBTestBed tBtestBedInstance
+		#myTestBed = createTestBed(Collection of URLS to the execution nodes)
+	
+	#filePath - String containing the filepath where the test cases are located.
+	#smartFilePath - Optional string containing the filepath where the production source code is located. This would be useful for TBSmartTestSuite creation.
+	#tagList - String containing the list of tags which are desired to be executed among the existing test code within the specified location
+	#puede que sea privado, ahorita lo consideramos publico y no lo mandamos a llamar en el constructor
+    def createTestSuite(self, filePath, smartFilePath, tagList):
+	
+	#Prieor hay que checar que las últimas dos variables no sean nulas
+	#Si no son deben contener ubicacion válidas
+	if smartFilePath is not null or tagList is not null
+		if validateExisitingLocations(smartFilePath) and validateExisitingLocations(tagList)
+			tbTestSuiteInstance = createTestSuite()
+			
+	else
+		#Throw Invalid Argument Exception.
+	
+	#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the test plan will be generated.
+	#testPlanLocation - String specifying the location where the test plan wants to be placed.
+	#outputFormat - Enumeration flag specifying the output format of the created test plan.
+	def publishTestPlan(self, tbTestSuiteInstance, testPlanLocation, outputFormat):
+		#TBTAFPublisher tbtafPublisherInstance
+		#tbtafPublisherInstance.PublishTestPlan(tbTestSuiteInstance, testPlanLocation, outputFormat)
+
+	#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the result report will be generated.
+	#resultLocation - String specifying the location where the result report wants to be placed.
+	#outputFormat - Enumeration flag specifying the output format of the created result report.
+	def publishTestResults(self, tbTestSuiteInstance, resultLocation, outputFormat):
+		#TBTAFPublisher tbtafPublisherInstance
+		#tbtafPublisherInstance.PublishTestResults(tbTestSuiteInstance, resultLocation, outputFormat)
+	
+	#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the result report will be generated.
+
+    tbTestSuiteInstance - Reference of the TBTestSuite representing the set of tests that will be executed.
+    urlCollection - Optional collection of URLs corresponding to the nodes on which the test execution will be distributed.
+    flagsCollection - Optional collection of flags that can customize the execution of such TBTestSuite.
+    executorListenerCollection - Optional collection of ExecutorListener implementations that would want to listen and react to specific events during the execution of that specific TBTestSuite
+
+	def excuteTestSuite(self, tbTestSuiteInstance, urlCollection, flagsCollection, executorListenerCollection):
+		#TBTAFExecutor tbtafExecutorInstance
+		return tbtafExecutorInstance.ExecuteTests(tbTestSuiteInstance, urlCollection, flagsCollection, executorListenerCollection)
+
     def getEventSource(self):
         return self.eventSource
-
-   
-        
-    
