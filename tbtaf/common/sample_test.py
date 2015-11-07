@@ -15,13 +15,16 @@ class TBTAFSampleTest(TBTestCase):
     classdocs
     '''
 
-
+    
+        
     def __init__(self):
         '''
         Constructor
         '''
+        self.testResult = None
+        self.testTrace = None
         self.testTimeout = 1984
-
+        
     def setup(self):
         TBTestCase.setup(self)
         print "Setup performed from TBTAFSampleTest"

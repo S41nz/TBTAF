@@ -21,6 +21,8 @@ class TBTestCase:
         '''
         Constructor
         '''
+        self.testTrace = None
+        self.testResult = None
     
     @abstractmethod
     def setup(self):
