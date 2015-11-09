@@ -13,7 +13,12 @@ class TBTAFOrchestrator(object):
     '''
     
     #Fields
-
+	#Declare global variables
+	_tBTestSuiteInstance
+	_tBTestBedInstance
+	_projectName
+	TBTAFInterpreter _interpreter
+	
     def __init__(self, nameFile = "nameFileDefault.txt"):
 		#El parametro nameFile
         '''
@@ -23,15 +28,21 @@ class TBTAFOrchestrator(object):
 		#buscar como tirar una initialiation exception
 		#buscar como tirar una invalid argument exception
 
-		#Initialize interpreter
-		#TBTAFInterpreter interpreter()
+		#Initialize variables
+		#TBTAFInterpreter _interpreter
+		_tBTestSuiteInstance
+		_tBTestBedInstance
+		_projectName
 		
 
-    def createNewProject(tBTestSuiteInstance, tBTestBedInstance, projectName):
+    def createNewProject(tBTestSuiteInstance, tBTestBedInstance, projectName):		
+		_tBTestSuiteInstance = tBTestSuiteInstance
+		_tBTestBedInstance = tBTestBedInstance
+		_projectName = projectName
 		#Invalid Argument Exception
         
     def parseScript(self, filePath):
-		#return interpreter.parseScript(filePath)
+		#return _interpreter.parseScript(filePath)
 
     def createTestBed(self, urlList):
         #if urlList is null
@@ -71,15 +82,21 @@ class TBTAFOrchestrator(object):
 		#tbtafPublisherInstance.PublishTestResults(tbTestSuiteInstance, resultLocation, outputFormat)
 	
 	#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the result report will be generated.
-
-    tbTestSuiteInstance - Reference of the TBTestSuite representing the set of tests that will be executed.
-    urlCollection - Optional collection of URLs corresponding to the nodes on which the test execution will be distributed.
-    flagsCollection - Optional collection of flags that can customize the execution of such TBTestSuite.
-    executorListenerCollection - Optional collection of ExecutorListener implementations that would want to listen and react to specific events during the execution of that specific TBTestSuite
-
+    #tbTestSuiteInstance - Reference of the TBTestSuite representing the set of tests that will be executed.
+    #urlCollection - Optional collection of URLs corresponding to the nodes on which the test execution will be distributed.
+    #flagsCollection - Optional collection of flags that can customize the execution of such TBTestSuite.
+    #executorListenerCollection - Optional collection of ExecutorListener implementations that would want to listen and react to specific events during the execution of that specific TBTestSuite
 	def excuteTestSuite(self, tbTestSuiteInstance, urlCollection, flagsCollection, executorListenerCollection):
 		#TBTAFExecutor tbtafExecutorInstance
 		return tbtafExecutorInstance.ExecuteTests(tbTestSuiteInstance, urlCollection, flagsCollection, executorListenerCollection)
+	
+    #projectName - String identifying the Project from where the query is being made.
+    #tagList - Optional List of tags in order to filter the query being made.
+    #indicatorEnumeration - If the list of tags is provided, then an additional enumeration can be passed in order to specify if the tags will be used to filter IN or OUT the results found.	
+	def GetTests(projectName, tagList, inOutList)
+		_tBTestSuiteInstance
+		
+		return 
 
     def getEventSource(self):
         return self.eventSource
