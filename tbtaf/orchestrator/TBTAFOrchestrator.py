@@ -51,6 +51,7 @@ class TBTAFOrchestrator(object):
 		#Initialize TBTestBed
 		#TBTestBed tBtestBedInstance
 		#myTestBed = createTestBed(Collection of URLS to the execution nodes)
+		#La lista de urls va a estar asociado a un proyecto.
 	
 	#filePath - String containing the filepath where the test cases are located.
 	#smartFilePath - Optional string containing the filepath where the production source code is located. This would be useful for TBSmartTestSuite creation.
@@ -58,7 +59,7 @@ class TBTAFOrchestrator(object):
 	#puede que sea privado, ahorita lo consideramos publico y no lo mandamos a llamar en el constructor
     def createTestSuite(self, filePath, smartFilePath, tagList):
 	
-	#Prieor hay que checar que las últimas dos variables no sean nulas
+	#Primero hay que checar que las últimas dos variables no sean nulas
 	#Si no son deben contener ubicacion válidas
 	if smartFilePath is not null or tagList is not null
 		if validateExisitingLocations(smartFilePath) and validateExisitingLocations(tagList)
@@ -66,6 +67,7 @@ class TBTAFOrchestrator(object):
 			
 	else
 		#Throw Invalid Argument Exception.
+	
 	
 	#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the test plan will be generated.
 	#testPlanLocation - String specifying the location where the test plan wants to be placed.
@@ -94,9 +96,12 @@ class TBTAFOrchestrator(object):
     #tagList - Optional List of tags in order to filter the query being made.
     #indicatorEnumeration - If the list of tags is provided, then an additional enumeration can be passed in order to specify if the tags will be used to filter IN or OUT the results found.	
 	def GetTests(projectName, tagList, inOutList)
-		_tBTestSuiteInstance
-		
-		return 
+				
+		#If the parameters being passed are null or contain null then an Invalid Argument Exception will be thrown.
+		#If the provided Project key does not exist on the currently connected datasource, then a Not Existing Project Exception will be thrown.
+		#If the provided filtering enumeration is provided, then a Not Supported Filter Exception will be thrown.
+
+		return _tBTestSuiteInstance.getTestCases(tagList, inOutList)
 
     def getEventSource(self):
         return self.eventSource
