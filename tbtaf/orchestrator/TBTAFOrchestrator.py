@@ -14,10 +14,8 @@ class TBTAFOrchestrator(object):
     
     #Fields
 	#Declare global variables
-	_tBTestSuiteInstance
-	_tBTestBedInstance
-	_projectName
-	TBTAFInterpreter _interpreter
+	#TBTAFInterpreter _interpreter
+	#projectList
 	
     def __init__(self, nameFile = "nameFileDefault.txt"):
 		#El parametro nameFile
@@ -30,15 +28,14 @@ class TBTAFOrchestrator(object):
 
 		#Initialize variables
 		#TBTAFInterpreter _interpreter
-		_tBTestSuiteInstance
-		_tBTestBedInstance
-		_projectName
+		#projectList
 		
+	def addProject(self, newProject)
+		self.projectList.append(newProject)
 
-    def createNewProject(tBTestSuiteInstance, tBTestBedInstance, projectName):		
-		_tBTestSuiteInstance = tBTestSuiteInstance
-		_tBTestBedInstance = tBTestBedInstance
-		_projectName = projectName
+    def createNewProject(tBTestSuiteInstance, tBTestBedInstance, projectName):
+		Project project =  new Project(tBTestSuiteInstance, tBTestBedInstance, projectName)
+		self.addProject(project)
 		#Invalid Argument Exception
         
     def parseScript(self, filePath):
@@ -103,5 +100,14 @@ class TBTAFOrchestrator(object):
 
 		return _tBTestSuiteInstance.getTestCases(tagList, inOutList)
 
+	#projectName - String describing the project from which the query is being made.
+	def GetTags(projectName)
+		tagList[]
+		testCase in getProject(projectName).tbTestSuiteInstance.getTestCases()
+			tagList.append(testCase.getMetadata.getTags)
+		return tagList
+		#Excepciones
+		#If null string is provided as Project ID then an Invalid Argument Exception will be thrown.
+	
     def getEventSource(self):
         return self.eventSource
