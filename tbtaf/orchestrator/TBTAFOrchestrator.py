@@ -16,9 +16,10 @@ class TBTAFOrchestrator(object):
 	#Declare global variables
 	#TBTAFInterpreter _interpreter
 	#projectList
+	#suiteTestCases = []
+	projectList = []
 	
-    def __init__(self, nameFile = "nameFileDefault.txt"):
-		#El parametro nameFile
+    def __init__(self, nameInitizalizationFile):
         '''
         Constructor
         '''
@@ -29,6 +30,23 @@ class TBTAFOrchestrator(object):
 		#Initialize variables
 		#TBTAFInterpreter _interpreter
 		#projectList
+		#self.suiteType = suiteType
+        #self.suiteID = suiteID
+		
+    def __init__(self):
+
+        '''
+        Constructor
+        '''
+		#leer archivo los parametros. Si no, tener unos parametros por default.
+		#buscar como tirar una initialiation exception
+		#buscar como tirar una invalid argument exception
+
+		#Initialize variables
+		#TBTAFInterpreter _interpreter
+		#projectList
+		#self.suiteType = suiteType
+        #self.suiteID = suiteID
 		
 	def addProject(self, newProject)
 		self.projectList.append(newProject)
