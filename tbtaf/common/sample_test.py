@@ -9,6 +9,8 @@ from common.trace import TBTAFTrace
 from common.event import TBTAFEvent
 from common.enums.verdict_type import TBTAFVerdictType
 from common.enums.event_type import TBTAFEventType
+from common.metadata import TBMetadata
+import time
 
 class TBTAFSampleTest(TBTestCase):
     '''
@@ -21,9 +23,10 @@ class TBTAFSampleTest(TBTestCase):
         '''
         Constructor
         '''
-        self.testResult = None
+        self.testResult = TBTAFResult(TBTAFVerdictType.INCONCLUSIVE,"TBTAFSampleTest")
         self.testTrace = None
         self.testTimeout = 1984
+        self.testMetadata = TBMetadata('TEST')
         
     def setup(self):
         TBTestCase.setup(self)
@@ -34,6 +37,7 @@ class TBTAFSampleTest(TBTestCase):
 
 
     def execute(self):
+        time.sleep(7)
         TBTestCase.execute(self)
         print "Execute performed from TBTAFSampleTest"
         self.testResult = TBTAFResult(TBTAFVerdictType.PASS,"TBTAFSampleTest")

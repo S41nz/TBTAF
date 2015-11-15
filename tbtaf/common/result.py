@@ -10,7 +10,6 @@ class TBTAFResult(object):
     '''
     Class that encapsulates the information related to the result of the execution of a given TBTAFTestCase
     '''
-    
 
     def __init__(self, testVerdict,resultSource):
         '''
@@ -18,34 +17,36 @@ class TBTAFResult(object):
         '''
         self.testVerdict = testVerdict
         self.resultSource = resultSource
-		self.passTests = 0
+        self.passTests = 0
         self.inconclusiveTests = 0
         self.failedTests = 0
+        self.startTimestamp = None
+        self.endTimestamp = None
         
     def getVerdict(self):
         return self.testVerdict
     
     def getResultSource(self):
         return self.resultSource
-		
-	def getPassTests(self):
-		return self.passTests
+        
+    def getPassTests(self):
+        return self.passTests
 
-	def getInconclusiveTests(self):
-		return self.inconclusiveTests
-		
-	def getFailedTests(self):
-		return self.failedTests		
-	
-	def setPassTests(self,passTests):
-		self.passTests = passTests
+    def getInconclusiveTests(self):
+        return self.inconclusiveTests
+        
+    def getFailedTests(self):
+        return self.failedTests        
+    
+    def setPassTests(self,passTests):
+        self.passTests = passTests
 
-	def setInconclusiveTests(self,inconclusiveTests):
-		self.inconclusiveTests = inconclusiveTests
-		
-	def setFailedTests(self,failedTests):
-		self.failedTests = failedTests
-	
+    def setInconclusiveTests(self,inconclusiveTests):
+        self.inconclusiveTests = inconclusiveTests
+        
+    def setFailedTests(self,failedTests):
+        self.failedTests = failedTests
+    
     def setStartTimestamp(self,startTime):
         self.startTimestamp = startTime
     

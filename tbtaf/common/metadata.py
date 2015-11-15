@@ -3,6 +3,7 @@ Created on 04/11/2015
 
 @author: S41nz
 '''
+from random import randint
 
 class TBMetadata(object):
     '''
@@ -21,6 +22,7 @@ class TBMetadata(object):
         Constructor
         '''
         self.metadataType = metadataType
+        self.assetID = randint(0,999)
     
     def getMetadataType(self):
         return self.metadataType
