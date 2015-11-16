@@ -8,6 +8,7 @@ from common.suite import TBTestSuite
 from common.result import TBTAFResult
 from common.enums.suite_type import TBTAFTestSuiteType
 from common.enums.verdict_type import TBTAFVerdictType
+from common.enums.filter_type import TBTAFFilterType
 
 class TBSmartTestSuite(TBTestSuite):
     '''
@@ -25,7 +26,7 @@ class TBSmartTestSuite(TBTestSuite):
         self.suiteID = suiteID
     
     
-    def getTestCases(self,targetTags):
+    def getTestCases(self,targetTags,queryFilter=None):
         '''
         Method to obtain the tests that contain at least one of the given tags on the input list
         '''
@@ -41,21 +42,37 @@ class TBSmartTestSuite(TBTestSuite):
                     testMetadata = candidateTest.getTestMetadata()
                     if testMetadata is not None:
                         testTags = testMetadata.getTags()
-                        if testTags is not None and targetTag in testTags:
+                        if self.appendTestCase(testTags, targetTag, queryFilter):
                             #There is a tag match, however we need to confirm if it has not been added yet to the result set
                             if candidateTest not in resultTestCases:
                                 resultTestCases.append(candidateTest)
                             
         return resultTestCases
     
-    
-    def getSuiteResult(self,tags):
+    def appendTestCase(self,testTags,targetTag,queryFilter):
+        '''
+        Method to determine whether or not a given test case should be included or not 
+        for a given query
+        '''
+        if targetTag in testTags:
+            if(queryFilter == None or queryFilter == TBTAFFilterType.IN):
+                return True
+            else:
+                return False
+        else:
+            if(queryFilter == None or queryFilter == TBTAFFilterType.IN):
+                return False
+            else:
+                return True
+        
+        
+    def getSuiteResult(self,tags,queryFilter=None):
         '''
         Method to obtain the TBTAF result based on a specific set of tags
         '''
         TBTestSuite.getSuiteResult(self)
         #Obtain the test cases based on the tag query
-        selectedTestCases = self.getTestCases(tags)
+        selectedTestCases = self.getTestCases(tags,queryFilter)
         
         candidateVerdict = TBTAFVerdictType.INCONCLUSIVE
         startTimestamp = sys.maxsize
