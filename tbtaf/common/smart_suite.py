@@ -119,5 +119,9 @@ class TBSmartTestSuite(TBTestSuite):
         suiteResult = TBTAFResult(candidateVerdict,self.suiteID)
         suiteResult.setStartTimestamp(startTimestamp)
         suiteResult.setEndTimestamp(endTimestamp)
+        #Set the summary results at the suite level
+        suiteResult.setInconclusiveTests(inconclusiveTests)
+        suiteResult.setFailedTests(failedTests)
+        suiteResult.setPassTests(passTests)
         
         return suiteResult

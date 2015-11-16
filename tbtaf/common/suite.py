@@ -115,6 +115,10 @@ class TBTestSuite(object):
         suiteResult = TBTAFResult(candidateVerdict,self.suiteID)
         suiteResult.setStartTimestamp(startTimestamp)
         suiteResult.setEndTimestamp(endTimestamp)
+        #Store the summary indicators on the result object
+        suiteResult.setInconclusiveTests(inconclusiveTests)
+        suiteResult.setFailedTests(failedTests)
+        suiteResult.setPassTests(passTests)
         
         return suiteResult
     
