@@ -4,12 +4,18 @@ Created on 02/11/2015
 @author: S41nz
 '''
 
-import time
+#import time
+from common.test_bed import TBTestBed
+from common.project import TBProject
+from common.smart_suite import TBSmartTestSuite
+from common.node import TBTestNode
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
+#from common.node import TBTestNode
 
-#class TBTAFOrchestrator():
 class TBTAFOrchestrator(object):
     '''
-    Class that encapsulates the information from a given event within the TBTAF 
+    
     '''
     
     #Fields
@@ -17,31 +23,17 @@ class TBTAFOrchestrator(object):
 	#TBTAFInterpreter _interpreter
 	#projectList
 	#suiteTestCases = []
-	projectList = []
 	
-    def __init__(self, nameInitizalizationFile):
+	
+    def __init__(self, nameInitizalizationFile = ""):
         '''
         Constructor
         '''
 		#leer archivo los parametros. Si no, tener unos parametros por default.
 		#buscar como tirar una initialiation exception
 		#buscar como tirar una invalid argument exception
-
-		#Initialize variables
-		#TBTAFInterpreter _interpreter
-		#projectList
-		#self.suiteType = suiteType
-        #self.suiteID = suiteID
-		
-    def __init__(self):
-
-        '''
-        Constructor
-        '''
-		#leer archivo los parametros. Si no, tener unos parametros por default.
-		#buscar como tirar una initialiation exception
-		#buscar como tirar una invalid argument exception
-
+		projectList = []
+		self._interpreter = TBTAFInterpreter()
 		#Initialize variables
 		#TBTAFInterpreter _interpreter
 		#projectList
@@ -52,26 +44,63 @@ class TBTAFOrchestrator(object):
 		self.projectList.append(newProject)
 
     def createNewProject(tBTestSuiteInstance, tBTestBedInstance, projectName):
-		Project project =  new Project(tBTestSuiteInstance, tBTestBedInstance, projectName)
-		self.addProject(project)
-		#Invalid Argument Exception
+		#Revisar si es la forma pythonesca y si funcionan.
+		if isInvalidArgument(tBTestSuiteInstance) or isInvalidArgument(tBTestBedInstance) or isInvalidArgument(projectName):
+			print 'Error: TBTAFOrchestrator.createNewProject'
+		else:
+			if projectName in (projectInstance.projectName for projectInstance in projectList):
+				raise ValueError("Already Existing Project Exception")
+			else:
+				project =  TBProject(tBTestSuiteInstance, tBTestBedInstance, projectName)
+				self.addProject(project) 
+				#Agregar mensajes de confirmacion en linea de comandos
+				print 'New project created: ', projectName
+				#Duda: Si es un Smart Test Suite, hay que poner todos? porque no se reciben etiquetas como parámetro, sólo el TBTestSuiteInstance
+				#Duda: Qué pasa si llamamos a gestTestCases() para un smart suite... se corre el de TBTestSuite o de TBSmartTestSuite?
+				print 'Number of tests: ', len(tBTestSuiteInstance.getTestCases()) 
+				print 'Execution nodes: ', ', '.join(testNode.getNodeURL() for testNode in tBTestBedInstance.getTestBedNodes())
         
     def parseScript(self, filePath):
-		#return _interpreter.parseScript(filePath)
+		return self._interpreter.parseScript(filePath)
 
-    def createTestBed(self, urlList):
-        #if urlList is null
-			#urlList = "localhost"
+    def createTestBed(self, urlList = ['localhost']):
+		tBtestBedInstance = TBTestBed()
+		isValidUrlList = True
 		
-		#Initialize TBTestBed
-		#TBTestBed tBtestBedInstance
-		#myTestBed = createTestBed(Collection of URLS to the execution nodes)
-		#La lista de urls va a estar asociado a un proyecto.
+		if  isInvalidArgument(urlList):
+			print 'Error: TBTAFOrchestrator.createTestBed'
+		else:
+			for url in urlList:
+				if validateUrl(url):
+					tBtestBedInstance.addExecutionNode(url)
+				else
+					isValidUrlList = False
+					print 'Error: TBTAFOrchestrator.createTestBed'
+					break
+				
+			if isValidUrlList:
+				return tBtestBedInstance
+		
+	def isInvalidArgument(argument):
+		if argument == None or argument == "":
+			raise ValueError("Invalid Argument Exception")
+			return True
+		else:
+			return False
+
+	def validateUrl(url):
+		val = URLValidator(verify_exists=False)
+		try:
+			val(url)
+			return True
+		except ValidationError, e:
+			#print e
+			print 'Invalid Argument exception'
 	
 	#filePath - String containing the filepath where the test cases are located.
 	#smartFilePath - Optional string containing the filepath where the production source code is located. This would be useful for TBSmartTestSuite creation.
 	#tagList - String containing the list of tags which are desired to be executed among the existing test code within the specified location
-	#puede que sea privado, ahorita lo consideramos publico y no lo mandamos a llamar en el constructor
+	#puede que sea privado, ahorita lo consideramos publico y no lo mandamos a llamar en el constructor	
     def createTestSuite(self, filePath, smartFilePath, tagList):
 	
 	#Primero hay que checar que las últimas dos variables no sean nulas
