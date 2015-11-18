@@ -11,7 +11,7 @@ class TBTestBed(object):
     '''
 
 
-    def __init__(self, executionNodes):
+    def __init__(self, executionNodes = []):
         '''
         Constructor
         '''
