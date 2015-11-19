@@ -10,25 +10,25 @@ from ExecutionTBTestSuite import ExecutionTBTestSuite
 
 class TBTAFExecutor:
 
-    def checkURLsExist(self, parameter):
+    def validateTestBed(self, parameter):
         return True
         
     def checkFlagsExist(self, parameter):
         return True
 
-    def executeTests(self, tbTestSuite, nodeURLs=[], testSuiteFlags=[], executorListener=[]):
+    def executeTests(self, tbTestSuite, testBed='dummy', testSuiteFlags=[], executorListener=[]):
   
         #Si estos son opcionales no deberian ser distintas estas condiciones?
-        if tbTestSuite is None or nodeURLs is None or testSuiteFlags is None or executorListener is None:
+        if tbTestSuite is None or testBed is None or testSuiteFlags is None or executorListener is None:
             raise ValueError('Invalid Argument Exception')
-        if not self.checkURLsExist(nodeURLs): #Dummy method
+        if not self.validateTestBed(testBed): #Dummy method
             raise ValueError('Invalid Node Exception')
         if not self.checkFlagsExist(testSuiteFlags): #Dummy method
             raise ValueError('Invalid Option Exception')
         
         executionTBTestSuite = ExecutionTBTestSuite.getBySuite(tbTestSuite)
         if executionTBTestSuite is None:
-            executionTBTestSuite = ExecutionTBTestSuite(tbTestSuite, nodeURLs, testSuiteFlags, executorListener)
+            executionTBTestSuite = ExecutionTBTestSuite(tbTestSuite, testBed, testSuiteFlags, executorListener)
         
         if executionTBTestSuite.getStatus() != 'Executing':
             executionTBTestSuite.execute()

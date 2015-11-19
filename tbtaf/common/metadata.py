@@ -3,12 +3,12 @@ Created on 04/11/2015
 
 @author: S41nz
 '''
-from random import randint
 
 class TBMetadata(object):
     '''
     Class that encapsulates all the metadata decoration that can be discovered within a source code asset.
     '''
+    NON_INITIALIZED = -1
     
     #Fields
     #Empty list to store the discovered tags within the asset
@@ -22,7 +22,7 @@ class TBMetadata(object):
         Constructor
         '''
         self.metadataType = metadataType
-        self.assetID = randint(0,999)
+        self.assetID = NON_INITIALIZED
     
     def getMetadataType(self):
         return self.metadataType

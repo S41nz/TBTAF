@@ -8,9 +8,9 @@ class ExecutionTBTestSuite:
     def getBySuite(tbTestSuite):
         return ExecutionTBTestSuite.dictionary.get(tbTestSuite)
 
-    def __init__(self, tbTestSuite, nodeURLs, testSuiteFlags, executorListener):
+    def __init__(self, tbTestSuite, testBed, testSuiteFlags, executorListener):
         self.tbTestSuite = tbTestSuite
-        self.nodeURLs = nodeURLs
+        self.testBed = testBed
         self.testSuiteFlags = testSuiteFlags
         self.executorListener = executorListener
         self.nextIndexToExecute = 0
@@ -78,3 +78,4 @@ class ExecutionTBTestSuite:
         for test in self.tbTestSuite.getTestCases():
             id = test.getTestMetadata().getAssetID()
             print str(id) + ': ' + test.getResult().getVerdict()
+        return self.tbTestSuite.getSuiteResult()
