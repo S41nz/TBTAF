@@ -22,7 +22,7 @@ class TBMetadata(object):
         Constructor
         '''
         self.metadataType = metadataType
-        self.assetID = NON_INITIALIZED
+        self.assetID = self.NON_INITIALIZED
     
     def getMetadataType(self):
         return self.metadataType
