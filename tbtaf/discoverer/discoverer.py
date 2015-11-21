@@ -22,12 +22,6 @@ class TBTAFDiscoverer():
     discovered data to the TBTAF Orchestrator.
     '''
     
-
-    def __init__(self):
-        '''
-        This class only contains static methods. Therefore no initialization.
-        '''
-    
     # Currently is very explicit for clarity. Can be made shorter and use less
     #  memory.    
     @staticmethod
@@ -56,24 +50,9 @@ class TBTAFDiscoverer():
         ----(4.2) Instantiate and load metadata into all TBTestcase inheritors
         ----(4.3) Return a collection of those instances
         '''
-        pyFiles = []
-        if path is None:
-            raise ValueError("Empty path was provided")
-        if path.endswith('.py'):
-            dirPath = os.path.realpath(os.path.abspath(os.path.dirname(path)))
-            filePath = os.path.realpath(os.path.abspath(path))
-            if not os.path.exists(filePath):
-                raise ValueError("Invalid path was provided")
-            pyFiles.append(filePath)
-        else:
-            dirPath = os.path.realpath(os.path.abspath(path))
-            if not os.path.exists(dirPath):
-                raise ValueError("Invalid path was provided")
-            pyFiles = [f for f in glob.glob(os.path.join(dirPath, '*.py'))]
-        if dirPath not in sys.path:
-            sys.path.insert(0, dirPath)
         testCollection = []
         testModules = []
+        pyFiles = TBTAFDiscoverer._findPyFiles(path,True)
         for f in pyFiles:
             moduleName = os.path.basename(f)[:-3]
             if moduleName.startswith('__'): continue
@@ -96,11 +75,11 @@ class TBTAFDiscoverer():
     
     
     @staticmethod
-    def LoadCodeMetadata(paths):
+    def LoadCodeMetadata(path):
         '''
         Inputs:
-        ----Collection of strings describing the location of specific
-         production source code files.
+        ----String specifying the directory where specific production source
+         code files are contained or the complete filepath to a single file.
         Outputs:
         ----A collection of TBMetadata instances describing the metadata being
          discovered on the source code of each test within the provided
@@ -118,32 +97,49 @@ class TBTAFDiscoverer():
         ----(4.1) Read all metadata from the files
         ----(4.2) Return a collection of this metadata
         '''
-        if not paths:
-            raise ValueError("No paths were provided")
-        pyFiles = []
-        for p in paths: 
-            if p is None:
-                raise ValueError("Empty path was provided")
-            dirPath = os.path.realpath(os.path.abspath(os.path.dirname(p)))
-            filePath = os.path.realpath(os.path.abspath(p))
-            if not os.path.exists(filePath):
-                raise ValueError("Invalid path was provided")
-            if not p.endswith('.py'):
-                continue
-            pyFiles.append(filePath)
-            if dirPath not in sys.path:
-                sys.path.insert(0, dirPath)
+        if not path:
+            raise ValueError("No path was provided")
+        pyFiles = TBTAFDiscoverer._findPyFiles(path,False)
         codeMetadata = []
         for f in pyFiles:
-            moduleName = os.path.basename(f)[:-3]
-            module = importlib.import_module(moduleName)
-            firstComment = inspect.getdoc(module)
+            firstComment = TBTAFDiscoverer._readFirstMultilineComment(f)
             metaData = TBTAFDiscoverer._parseXML(firstComment,f,
                                                  TBTAFMetadataType.PRODUCT_CODE
                                                  )
             if metaData is not None:
                 codeMetadata.append(metaData)
         return codeMetadata
+
+    @staticmethod
+    def _findPyFiles(path,add_to_sys_path=False):
+        '''
+        Inputs:
+        ----<path>: String with path to single .py file or to folder containing
+         .py files.
+        ----[add_to_sys_path]: Boolean determining whether of nor to add the
+         corresponding path to sys.path (i.e. modules will be imported or not).
+        Outputs:
+        ----List of found files with their full, normalized paths.
+        Notes:
+        ----Currently is not recursive.
+        '''
+        pyFiles = []
+        if path is None:
+            raise ValueError("Empty path was provided")
+        if path.endswith('.py'):
+            dirPath = os.path.realpath(os.path.abspath(os.path.dirname(path)))
+            filePath = os.path.realpath(os.path.abspath(path))
+            if not os.path.exists(filePath):
+                raise ValueError("Invalid path was provided")
+            pyFiles.append(filePath)
+        else:
+            dirPath = os.path.realpath(os.path.abspath(path))
+            if not os.path.exists(dirPath):
+                raise ValueError("Invalid path was provided")
+            pyFiles = [f for f in glob.glob(os.path.join(dirPath, '*.py'))]
+        if add_to_sys_path and dirPath not in sys.path:
+            sys.path.insert(0, dirPath)
+        return pyFiles
 
     @staticmethod
     def _parseXML(s,f,t):
@@ -201,16 +197,50 @@ class TBTAFDiscoverer():
         else:
             md.setAssetDescription(None)
         return md
-        
-if __name__ == '__main__':
-    # Any path style works! Woohoo!
-    testCollection = TBTAFDiscoverer.LoadTests(r'./\\\\\samples/\//')
-    for i in testCollection:
-        print i.getTestMetadata().getAssetDescription()
-        i.setup()
-        i.execute()
-        i.cleanup()
-    codeMetaDataCollection = TBTAFDiscoverer.LoadCodeMetadata([r'.\samples\testCompleteAndValid.py'])
-    for md in codeMetaDataCollection:
-        print md.getTags()
     
+    @staticmethod
+    def _readFirstMultilineComment(path):
+        '''
+        Inputs:
+        ----<path>: Filepath from where the comment will be read.
+        Outputs:
+        ----Multiline comment (i.e. three apostrophes) found on first line, or
+         on second line if first line starts with a she-bang (i.e. #!).
+         Excludes the comment symbols.
+        Notes:
+        ----The she-bang on the first line must be accepted because it's 
+         potentially necessary for users, and the O.S. has priority and doesn't
+         forgive.
+        '''
+        textInComment = ''
+        with open(path) as f:
+            in_comment = False
+            ln = 1
+            for line in f:
+                clean_line = line.strip()
+                if ln == 1 and clean_line.startswith("#!"):
+                    continue
+                elif ((ln == 1 or ln == 2)
+                      and not in_comment
+                      and clean_line.startswith("'''")):
+                    closing_pos = clean_line.find("'''",3)
+                    in_comment = True
+                    if closing_pos != -1:
+                        textInComment += clean_line[3:closing_pos]
+                        break
+                    else:
+                        textInComment += clean_line[3:]
+                elif in_comment:
+                    closing_pos = clean_line.find("'''")
+                    if closing_pos != -1:
+                        textInComment += clean_line[:closing_pos]
+                        break
+                    else:
+                        textInComment += clean_line
+                elif ln > 2:
+                    textInComment = ''
+                    logging.warning("File ignored. No metadata found in file" +
+                                 f.name)
+                    break
+                ln += 1
+        return textInComment
