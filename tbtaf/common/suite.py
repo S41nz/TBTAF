@@ -4,6 +4,7 @@ Created on 05/11/2015
 @author: S41nz
 '''
 import sys
+import datetime
 from common.result import TBTAFResult
 from common.enums.verdict_type import TBTAFVerdictType
 
@@ -81,8 +82,8 @@ class TBTestSuite(object):
         Method to obtain the result of a test suite execution
         '''
         candidateVerdict = TBTAFVerdictType.INCONCLUSIVE
-        startTimestamp = sys.maxsize
-        endTimestamp = 0
+        startTimestamp = datetime.datetime.max
+        endTimestamp = datetime.datetime.min
         passTests = 0
         inconclusiveTests = 0
         failedTests = 0
