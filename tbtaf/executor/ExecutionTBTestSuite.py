@@ -1,3 +1,5 @@
+from TBTAFExecutionStatus import TBTAFExecutionStatus
+from common.enums.execution_status_type import TBTAFExecutionStatusType
 from threading import Thread
 import time
 
@@ -16,7 +18,8 @@ class ExecutionTBTestSuite:
         self.nextIndexToExecute = 0
         self.aborted = None
         self.paused = None
-        self.status = "Not started"
+        self.status = TBTAFExecutionStatusType.NOT_STARTED
+        self.statusWrapper = TBTAFExecutionStatus()
         ExecutionTBTestSuite.dictionary[tbTestSuite] = self
     
     def markTestCaseAsExecuted(self, tbTestCase):
@@ -37,16 +40,16 @@ class ExecutionTBTestSuite:
         self.suiteRunner.start()
     
     def executionThread(self):
-        self.status = "Executing"
+        self.status = TBTAFExecutionStatusType.EXECUTING
         self.tbTestSuite.getSuiteResult().setStartTimestamp(time.time())
         
         for test in self.tbTestSuite.getTestCases()[self.nextIndexToExecute:]:    
             if self.paused == True:
-                self.status = "Paused"
+                self.status = TBTAFExecutionStatusType.PAUSED
                 break
             elif self.aborted == True:
                 #Se asume que INCONCLUSIVE es el Verdict default de un test case
-                self.status = "Aborted"
+                self.status = TBTAFExecutionStatusType.ABORTED
                 self.nextIndexToExecute = 0 #para poder ejecutarlo de nuevo desde 0
                 self.tbTestSuite.getSuiteResult().setEndTimestamp(time.time())
                 break
@@ -56,7 +59,7 @@ class ExecutionTBTestSuite:
                 test.getResult().setEndTimestamp(time.time())
                 self.nextIndexToExecute = self.nextIndexToExecute + 1
         if self.paused == False and self.abort == False:
-            self.status = "Completed"
+            self.status = TBTAFExecutionStatusType.COMPLETED
             self.tbTestSuite.getSuiteResult().setEndTimestamp(time.time())
     
     def abort(self):
@@ -74,8 +77,14 @@ class ExecutionTBTestSuite:
         print 'Suite status: ' + self.tbTestSuite.getSuiteResult().getVerdict()
         count = len(self.tbTestSuite.getTestCases())
         percentage = round(self.nextIndexToExecute * 100 / count, 2)
-        print 'Executed ' + str(self.nextIndexToExecute) + '/' + str(count) + ' : ' + str(percentage) + '%% completed'
+        print 'Executed ' + str(self.nextIndexToExecute) + '/' + str(count) + ' : ' + str(percentage) + '% completed'
         for test in self.tbTestSuite.getTestCases():
             id = test.getTestMetadata().getAssetID()
             print str(id) + ': ' + test.getResult().getVerdict()
-        return self.tbTestSuite.getSuiteResult()
+        
+        self.statusWrapper.setExecutionStatusType(self.getStatus())
+        self.statusWrapper.setSuiteResult(self.tbTestSuite.getSuiteResult())
+        self.statusWrapper.setTestCasesTotal(count)
+        self.statusWrapper.setTestCasesExecuted(self.nextIndexToExecute)
+        
+        return self.statusWrapper;
