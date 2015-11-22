@@ -47,6 +47,16 @@ class TBTestSuite(object):
         Method to add a test case to a given suite
         '''
         self.suiteTestCases.append(newTestCase)
+		
+    def addTestCaseList(self,newTestCaseList):
+        '''
+        Method to add a test case list to a given suite
+        '''
+		for newTestCase in newTestCaseList:
+			self.suiteTestCases.append(newTestCase)
+	
+	def removeTestCaseList(self)
+		suiteTestCases = []
     
     def getSuiteTrace(self):
         '''
