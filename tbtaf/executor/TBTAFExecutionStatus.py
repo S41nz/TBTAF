@@ -18,8 +18,8 @@ class TBTAFExecutionStatus:
     def getSuiteResult(self):
         return self.suiteResult
         
-    def getcompletionPercentage(self):
-        percentage = round(testCasesExecuted * 100 / testCasesTotal, 2)
+    def getCompletionPercentage(self):
+        percentage = round(self.testCasesExecuted * 100 / self.testCasesTotal, 2)
         return percentage
     
     def setTestCasesTotal(self,testCasesTotal):
@@ -31,5 +31,5 @@ class TBTAFExecutionStatus:
     def setTestCasesExecuted(self,testCasesExecuted):
         self.testCasesExecuted=testCasesExecuted
     
-    def getTestCasesTotal(self):
+    def getTestCasesExecuted(self):
         return self.testCasesExecuted
