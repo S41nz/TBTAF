@@ -4,13 +4,14 @@ Created on 02/11/2015
 @author: S41nz
 '''
 
-#import time
+import httplib
 from common.test_bed import TBTestBed
 from common.project import TBProject
 from common.smart_suite import TBSmartTestSuite
 from common.node import TBTestNode
-from django.core.validators import URLValidator
-from django.core.exceptions import ValidationError
+from interpreter.interpreter import TBInterpreter
+from discoverer.discoverer import TBDiscoverer
+
 #from common.node import TBTestNode
 
 class TBTAFOrchestrator(object):
@@ -23,23 +24,23 @@ class TBTAFOrchestrator(object):
 	#TBTAFInterpreter _interpreter
 	#projectList
 	#suiteTestCases = []
-	
-	
-    def __init__(self, nameInitizalizationFile = ""):
+
+	def __init__(self, nameInitizalizationFile = ""):
         '''
         Constructor
         '''
 		#leer archivo los parametros. Si no, tener unos parametros por default.
 		#buscar como tirar una initialiation exception
 		#buscar como tirar una invalid argument exception
-		projectList = []
-		self._interpreter = TBTAFInterpreter()
-		#Initialize variables
-		#TBTAFInterpreter _interpreter
-		#projectList
-		#self.suiteType = suiteType
-        #self.suiteID = suiteID
-		
+        if isInvalidArgument(nameInitizalizationFile):
+            print 'Error: TBTAFOrchestrator.__init__'
+        else:
+			projectList = []
+			#self._interpreter = TBTAFInterpreter()
+			#Initialize variables
+			#self.suiteType = suiteType
+			#self.suiteID = suiteID	
+
 	def addProject(self, newProject)
 		self.projectList.append(newProject)
 
@@ -61,7 +62,8 @@ class TBTAFOrchestrator(object):
 				print 'Execution nodes: ', ', '.join(testNode.getNodeURL() for testNode in tBTestBedInstance.getTestBedNodes())
         
     def parseScript(self, filePath):
-		return self._interpreter.parseScript(filePath)
+		_interpreter = TBTAFInterpreter()
+		return _interpreter.parseScript(filePath)
 
     def createTestBed(self, urlList = ['localhost']):
 		tBtestBedInstance = TBTestBed()
@@ -75,33 +77,54 @@ class TBTAFOrchestrator(object):
 					tBtestBedInstance.addExecutionNode(url)
 				else
 					isValidUrlList = False
+					print 'Invalid Argument exception'
 					print 'Error: TBTAFOrchestrator.createTestBed'
 					break
 				
 			if isValidUrlList:
+				print 'New test bed created on: ', urlList
 				return tBtestBedInstance
-		
+
 	def isInvalidArgument(argument):
 		if argument == None or argument == "":
 			raise ValueError("Invalid Argument Exception")
 			return True
 		else:
 			return False
-
-	def validateUrl(url):
-		val = URLValidator(verify_exists=False)
+			
+	def getServerStatusCode(url):
+		#https://pythonadventures.wordpress.com/2010/10/17/check-if-url-exists/
+		host, path = urlparse.urlparse(url)[1:3]
 		try:
-			val(url)
-			return True
-		except ValidationError, e:
-			#print e
-			print 'Invalid Argument exception'
+			conn = httplib.HTTPConnection(host)
+			conn.request('HEAD', path)
+			status = conn.getresponse().status
+			conn.close()
+			return status
+		except StandardError:
+			#Test this
+			conn.close()
+			return None
+	 
+	def validateUrl(url):
+		#https://pythonadventures.wordpress.com/2010/10/17/check-if-url-exists/
+		good_codes = [httplib.OK, httplib.FOUND, httplib.MOVED_PERMANENTLY]
+		valid = getServerStatusCode(url) in good_codes
+		return valid
 	
 	#filePath - String containing the filepath where the test cases are located.
 	#smartFilePath - Optional string containing the filepath where the production source code is located. This would be useful for TBSmartTestSuite creation.
 	#tagList - String containing the list of tags which are desired to be executed among the existing test code within the specified location
-	#puede que sea privado, ahorita lo consideramos publico y no lo mandamos a llamar en el constructor	
     def createTestSuite(self, filePath, smartFilePath, tagList):
+	
+	_discoverer = TBTAFInterpreter()
+	testCasesList = _discoverer.LoadTests(filePath)
+	
+	if
+	
+	for testCase in testCasesList
+		
+		
 	
 	#Primero hay que checar que las últimas dos variables no sean nulas
 	#Si no son deben contener ubicacion válidas
