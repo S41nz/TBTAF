@@ -17,28 +17,41 @@ class TBTAFPublisher(object):
 
     def PublishTestPlan(self, tBTestSuiteInstance, filePath, formatFlag):
         '''
-        Builds a test plan specification on a desired format
+        Builds a test plan specification on a HTML format
         based on the discovered metadata
         '''
-        htmlString = ""
-        testCasesList = tBTestSuiteInstance.getTestCases();
-
+        #Read HTML Template file and put into a string
+        htmlTemplate = open('/publisher/test_plan_template.html','r')
+        htmlString = htmlTemplate.read()
+        #Initialize tests HTML string
+        s_tests = ""
+        
+        #Iterate over test cases and retrieve test metadata
         for testCase in testCasesList:
+            #Initialize table row tag 
+            s_tests = s_tests  + "<tr>"
             testMetaData = testCase.getTestMetadata()
-            print testMetaData.getAssetID()
+            #Add test ID to HTML
+            s_tests = s_tests + "<td>" + str(testMetaData.getAssetID()) + "</td>"
+            #Add test description to HTML
+            s_tests = s_tests + "<td>" + testMetaData.getAssetDescription() + "</td>"
+            #Add test tags to HTML
             testTags = testMetaData.getTags()
-            tagsString = ""
             for tag in testTags:
-                tagsString = tagsString + tag + " "
-                print "Tags: " + tagsString
-            print testMetaData.getPriority()
-            print testMetaData.getAssetDescription()
-
-        '''
-        htmlFile = open(filePath,'w')
+                s_tests = s_tests + "<td>" + tag + ", "
+            #Remove last character from tags
+            s_tests = s_tests[:-2]
+            #Add close table data tag to HTML
+            s_tests = s_tests + "</td>"
+            #Add priority to HTML
+            s_tests = s_tests + "<td>" + str(testMetaData.getPriority()) + "</td>"
+            #Add close table row tag to HTML
+            s_tests = s_tests + "</tr>"
+        
+        htmlString = htmlString.replace('r_tests',s_tests)
+        htmlFile = open(filePath,'w+')
         htmlFile.write(htmlString)
         htmlFile.close()
-        '''
 
     def PublishResultReport(self, tBTestSuiteInstance, filePath, formatFlag):
         '''
