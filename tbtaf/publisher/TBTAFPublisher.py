@@ -52,8 +52,9 @@ class TBTAFPublisher(object):
             s_tests = s_tests + "<td>" + testMetaData.getAssetDescription() + "</td>"
             #Add test tags to HTML
             testTags = testMetaData.getTags()
+            s_tests = s_tests + "<td>"
             for tag in testTags:
-                s_tests = s_tests + "<td>" + tag + ", "
+                s_tests = s_tests + tag + ", "
             #Remove last character from tags
             s_tests = s_tests[:-2]
             #Add close table data tag to HTML
