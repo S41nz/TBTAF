@@ -4,6 +4,7 @@ Created on 07/11/2015
 @author: @andresmuro , @andres.alvarado , @mestradago , @rnunezc
 '''
 import datetime
+import os
 #class TBTAFPublisher():
 class TBTAFPublisher(object):
     '''
@@ -20,13 +21,27 @@ class TBTAFPublisher(object):
         Builds a test plan specification on a HTML format
         based on the discovered metadata
         '''
+
+        if os.path.exists(filePath):
+            #the file is there
+            pass
+        elif os.access(os.path.dirname(filePath), os.W_OK):
+            #the file does not exists but write privileges are given
+            pass
+        else:
+            #can not write there
+            pass
+
         #Read HTML Template file and put into a string
-        htmlTemplate = open('/publisher/test_plan_template.html','r')
+        htmlTemplate = open('publisher/test_plan_template.html','r')
         htmlString = htmlTemplate.read()
         #Initialize tests HTML string
         s_tests = ""
         
         #Iterate over test cases and retrieve test metadata
+        
+        testCasesList = tBTestSuiteInstance.getTestCases();
+
         for testCase in testCasesList:
             #Initialize table row tag 
             s_tests = s_tests  + "<tr>"
