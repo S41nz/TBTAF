@@ -48,14 +48,14 @@ class TBTestSuite(object):
         Method to add a test case to a given suite
         '''
         self.suiteTestCases.append(newTestCase)
-		
+
     def addTestCaseList(self,newTestCaseList):
         '''
         Method to add a test case list to a given suite
         '''
         for newTestCase in newTestCaseList:
             self.suiteTestCases.append(newTestCase)
-	
+
     def removeTestCaseList(self):
         suiteTestCases = []
     
@@ -76,7 +76,7 @@ class TBTestSuite(object):
                     self.testTraces.append(currentTrace)
                     
         return self.testTraces
-    
+
     def getSuiteResult(self):
         '''
         Method to obtain the result of a test suite execution
@@ -87,7 +87,7 @@ class TBTestSuite(object):
         passTests = 0
         inconclusiveTests = 0
         failedTests = 0
-        
+
         if self.suiteTestCases is not None:
             
             for suiteTestCase in self.suiteTestCases:
@@ -132,5 +132,3 @@ class TBTestSuite(object):
         suiteResult.setPassTests(passTests)
         
         return suiteResult
-    
-    

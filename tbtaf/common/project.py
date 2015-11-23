@@ -19,38 +19,38 @@ class TBProject(object):
         '''
         self.tbTestSuite = tbTestSuite
         self.tbTestBed = tbTestBed
-	self.projectName = projectName
+    self.projectName = projectName
     
     def getTBTestSuite(self):
         '''
         
         '''
         return self.tbTestSuite
-		
+        
     def getTBTestBed(self):
         '''
         
         '''
         return self.tbTestBed
-		
+        
     def getProjectName(self):
         '''
         
         '''
         return self.projectName
-		
+        
     def setTBTestSuite(tbTestSuite):
         '''
         
         '''
         self.tbTestSuite = tbTestSuite
-		
+        
     def setTBTestBed(tbTestBed):
         '''
         
         '''
         self.tbTestBed = tbTestBed
-		
+        
     def setProjectName(self, projectName):
         '''
         
