@@ -40,13 +40,13 @@ class TBTAFPublisher(object):
         htmlFile.close()
         '''
 
-    def PublishResultReport(tBTestSuiteInstance, filePath, formatFlag):
+    def PublishResultReport(self, tBTestSuiteInstance, filePath, formatFlag):
         '''
         Builds a test execution report on a HTML format
         based on the execution result of a given test suite
         '''
         #Read HTML Template file and put into a string
-        htmlTemplate = open('/publisher/results_template.html','r')
+        htmlTemplate = open('publisher/results_template.html','r')
         htmlString = htmlTemplate.read()
         #Get summary result from the test suite instance
         summaryTestSuite = tBTestSuiteInstance.getSuiteResult()
@@ -79,12 +79,13 @@ class TBTAFPublisher(object):
             s_overview = s_overview + "<td>" + testMetaData.getAssetDescription() + "</td>"
             #Add test tags to HTML
             testTags = testMetaData.getTags()
+            s_overview = s_overview + "<td>"
             for tag in testTags:
-                s_overview = s_overview + "<td>" + tag + ","
+                s_overview = s_overview + tag + ", "
             #Remove last character from tags
-            s_overview = s_overview[:-1]
+            s_overview = s_overview[:-2]
             #Add close table data tag to HTML
-            s_overview = s_overview + + "</td>"
+            s_overview = s_overview + "</td>"
             #Add priority to HTML
             s_overview = s_overview + "<td>" + str(testMetaData.getPriority()) + "</td>"
             #Retrieve test case result
@@ -109,8 +110,8 @@ class TBTAFPublisher(object):
             s_overview = s_overview + "</tr>"
 
         #Calculate report time
-        s_reportTime = reportTime.strftime('%B %d,%Y %H:%M:%S')
         reportTime = datetime.datetime.now()
+        s_reportTime = reportTime.strftime('%B %d,%Y %H:%M:%S')
 
         #Replace the html string with summary results
         htmlString = htmlString.replace('r_total_tests',str(totalTests))
