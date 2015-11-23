@@ -55,10 +55,17 @@ class TBTestSuite(object):
         '''
         for newTestCase in newTestCaseList:
             self.suiteTestCases.append(newTestCase)
+<<<<<<< HEAD
 
     def removeTestCaseList(self)
         suiteTestCases = []
 
+=======
+	
+    def removeTestCaseList(self):
+        suiteTestCases = []
+    
+>>>>>>> 9b534072eca153478b93be677f7e9fc7db20bdc1
     def getSuiteTrace(self):
         '''
         Method to obtain all the traces of the executed test cases
