@@ -21,7 +21,7 @@ class TBTAFPublisher(object):
         based on the discovered metadata
         '''
         #Read HTML Template file and put into a string
-        htmlTemplate = open('/publisher/test_plan_template.html','r')
+        htmlTemplate = open('publisher/test_plan_template.html','r')
         htmlString = htmlTemplate.read()
         #Initialize tests HTML string
         s_tests = ""
@@ -37,8 +37,9 @@ class TBTAFPublisher(object):
             s_tests = s_tests + "<td>" + testMetaData.getAssetDescription() + "</td>"
             #Add test tags to HTML
             testTags = testMetaData.getTags()
+            s_tests = s_tests + "<td>"
             for tag in testTags:
-                s_tests = s_tests + "<td>" + tag + ", "
+                s_tests = s_tests + tag + ", "
             #Remove last character from tags
             s_tests = s_tests[:-2]
             #Add close table data tag to HTML
