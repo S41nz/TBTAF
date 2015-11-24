@@ -4,6 +4,7 @@ Created on 05/11/2015
 @author: S41nz
 '''
 import sys
+import datetime
 from common.result import TBTAFResult
 from common.enums.verdict_type import TBTAFVerdictType
 
@@ -48,6 +49,16 @@ class TBTestSuite(object):
         Method to add a test case to a given suite
         '''
         self.suiteTestCases.append(newTestCase)
+
+    def addTestCaseList(self,newTestCaseList):
+        '''
+        Method to add a test case list to a given suite
+        '''
+        for newTestCase in newTestCaseList:
+            self.suiteTestCases.append(newTestCase)
+
+    def removeTestCaseList(self):
+        suiteTestCases = []
     
     def getSuiteTrace(self):
         '''
@@ -66,18 +77,18 @@ class TBTestSuite(object):
                     self.testTraces.append(currentTrace)
                     
         return self.testTraces
-    
+
     def getSuiteResult(self):
         '''
         Method to obtain the result of a test suite execution
         '''
         candidateVerdict = TBTAFVerdictType.INCONCLUSIVE
-        startTimestamp = sys.maxsize
-        endTimestamp = 0
+        startTimestamp = datetime.datetime.max
+        endTimestamp = datetime.datetime.min
         passTests = 0
         inconclusiveTests = 0
         failedTests = 0
-        
+
         if self.suiteTestCases is not None:
             
             for suiteTestCase in self.suiteTestCases:
@@ -122,5 +133,3 @@ class TBTestSuite(object):
         suiteResult.setPassTests(passTests)
         
         return suiteResult
-    
-    
