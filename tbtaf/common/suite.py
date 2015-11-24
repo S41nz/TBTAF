@@ -16,7 +16,7 @@ class TBTestSuite(object):
     #Fields
     
     #List of test cases that corresponds to a given test suite
-    suiteTestCases = []
+    #suiteTestCases = []
     
     def __init__(self,suiteType,suiteID):
         '''
@@ -24,6 +24,7 @@ class TBTestSuite(object):
         '''
         self.suiteType = suiteType
         self.suiteID = suiteID
+        self.suiteTestCases = []
         
     def getTestSuiteType(self):
         '''

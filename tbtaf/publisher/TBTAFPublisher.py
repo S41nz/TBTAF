@@ -4,6 +4,9 @@ Created on 07/11/2015
 @author: @andresmuro , @andres.alvarado , @mestradago , @rnunezc
 '''
 import datetime
+import os
+from IllegalArgumentException import IllegalArgumentException
+from NonSupportedFormatException import NonSupportedFormatException
 #class TBTAFPublisher():
 class TBTAFPublisher(object):
     '''
@@ -20,6 +23,17 @@ class TBTAFPublisher(object):
         Builds a test plan specification on a HTML format
         based on the discovered metadata
         '''
+
+        if formatFlag != "html":
+            print "Format " + formatFlag + " is not supported"
+            raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
+
+        try:
+            htmlFile = open(filePath,'w+')
+        except IOError:
+            print "Invalid filePath"
+            raise IllegalArgumentException("IllegalArgumentException in filePath argument in PublishTestPlan")
+        
         #Read HTML Template file and put into a string
         htmlTemplate = open('publisher/test_plan_template.html','r')
         htmlString = htmlTemplate.read()
@@ -27,6 +41,9 @@ class TBTAFPublisher(object):
         s_tests = ""
         
         #Iterate over test cases and retrieve test metadata
+        
+        testCasesList = tBTestSuiteInstance.getTestCases();
+        
         for testCase in testCasesList:
             #Initialize table row tag 
             s_tests = s_tests  + "<tr>"
@@ -50,7 +67,7 @@ class TBTAFPublisher(object):
             s_tests = s_tests + "</tr>"
         
         htmlString = htmlString.replace('r_tests',s_tests)
-        htmlFile = open(filePath,'w+')
+        
         htmlFile.write(htmlString)
         htmlFile.close()
 
@@ -59,6 +76,17 @@ class TBTAFPublisher(object):
         Builds a test execution report on a HTML format
         based on the execution result of a given test suite
         '''
+
+        if formatFlag != "html":
+            print "Format " + formatFlag + " is not supported"
+            raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
+
+        try:
+            htmlFile = open(filePath,'w+')
+        except IOError:
+            print "Invalid filePath"
+            raise IllegalArgumentException("IllegalArgumentException in filePath argument in PublishTestPlan")
+        
         #Read HTML Template file and put into a string
         htmlTemplate = open('publisher/results_template.html','r')
         htmlString = htmlTemplate.read()
@@ -138,6 +166,6 @@ class TBTAFPublisher(object):
         htmlString = htmlString.replace('r_elapsed_time',s_elapsedTime)
         htmlString = htmlString.replace('r_overview',s_overview)
         htmlString = htmlString.replace('r_report_time',s_reportTime)
-        htmlFile = open(filePath,'w+')
+        
         htmlFile.write(htmlString)
         htmlFile.close()

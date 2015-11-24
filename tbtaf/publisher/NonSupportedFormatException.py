@@ -1,0 +1,2 @@
+class NonSupportedFormatException(ValueError):
+    pass
