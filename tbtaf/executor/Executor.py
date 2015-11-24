@@ -47,7 +47,7 @@ class TBTAFExecutor:
 
         
     def abortExecution(self, tbTestSuite, background=False):
-        executionTBTestSuite = ExecutionTbTestSuite.getBySuite(tbTestSuite)
+        executionTBTestSuite = ExecutionTBTestSuite.getBySuite(tbTestSuite)
         status = executionTBTestSuite.getStatus()
         
         if status is None or status != 'Executing':
@@ -57,19 +57,19 @@ class TBTAFExecutor:
             This doesn't make any sense
             '''
             if background: 
-                thread = Thread(target = abortTestCases, args=[executionTBTestSuite])
+                thread = Thread(target = self.abortTestCases, args=[executionTBTestSuite])
                 thread.start()
             else:
-                abortTestCases(executionTBTestSuite)
+                self.abortTestCases(executionTBTestSuite)
             
-            return tbTestSuite.getResult()
+            return tbTestSuite.getSuiteResult()
         
     def abortTestCases(self, executionTBTestSuite):
         executionTBTestSuite.abort()
         
     
-    def pauseExcecution(self, tbTestSuite, background=False):
-        executionTBTestSuite = ExecutionTbTestSuite.getBySuite(tbTestSuite)
+    def pauseExecution(self, tbTestSuite, background=False):
+        executionTBTestSuite = ExecutionTBTestSuite.getBySuite(tbTestSuite)
         status = executionTBTestSuite.getStatus()
         
         if status is None or status != 'Executing':
@@ -79,18 +79,18 @@ class TBTAFExecutor:
             This doesn't make any sense
             '''
             if background: 
-                thread = Thread(target = pauseTestCases,  args=[executionTBTestSuite]) 
+                thread = Thread(target = self.pauseTestCases,  args=[executionTBTestSuite]) 
                 thread.start()
             else:
-                pauseTestCases(executionTBTestSuite)
-            return tbTestSuite.getResult()
+                self.pauseTestCases(executionTBTestSuite)
+            return tbTestSuite.getSuiteResult()
         
     def pauseTestCases(self, executionTBTestSuite):
-        executionTBTestSuite.paused = True
+        executionTBTestSuite.pause()
 
         
-    def resumeExcecution(self, tbTestSuite, background=False):
-        executionTBTestSuite = ExecutionTbTestSuite.getBySuite(tbTestSuite)
+    def resumeExecution(self, tbTestSuite, background=False):
+        executionTBTestSuite = ExecutionTBTestSuite.getBySuite(tbTestSuite)
         status = executionTBTestSuite.getStatus()
         
         if status is None or status != 'Paused':
@@ -100,12 +100,10 @@ class TBTAFExecutor:
             Revisar bien el uso del codigo de Thread
             '''
             if background:
-                thread = Thread(target = resumeTestCases,  args=[executionTBTestSuite]) 
+                thread = Thread(target = self.resumeTestCases,  args=[executionTBTestSuite]) 
                 thread.start()
             else:
-                resumeTestCases(tbTestSuite)
+                self.resumeTestCases(executionTBTestSuite)
             
     def resumeTestCases(self, executionTBTestSuite):
-        executionTBTestSuite.resume()
-
         executionTBTestSuite.resume()

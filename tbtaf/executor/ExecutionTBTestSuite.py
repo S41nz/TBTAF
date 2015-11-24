@@ -16,8 +16,8 @@ class ExecutionTBTestSuite:
         self.testSuiteFlags = testSuiteFlags
         self.executorListener = executorListener
         self.nextIndexToExecute = 0
-        self.aborted = None
-        self.paused = None
+        self.aborted = False
+        self.paused = False
         self.status = TBTAFExecutionStatusType.NOT_STARTED
         self.statusWrapper = TBTAFExecutionStatus()
         ExecutionTBTestSuite.dictionary[tbTestSuite] = self
@@ -36,6 +36,7 @@ class ExecutionTBTestSuite:
         self.suiteRunner.start()
         
     def resume(self):
+        self.paused = False
         self.suiteRunner = Thread(target = self.executionThread,  args=[])
         self.suiteRunner.start()
     
@@ -52,13 +53,14 @@ class ExecutionTBTestSuite:
                 self.status = TBTAFExecutionStatusType.ABORTED
                 self.nextIndexToExecute = 0 #para poder ejecutarlo de nuevo desde 0
                 self.tbTestSuite.getSuiteResult().setEndTimestamp(time.time())
+                self.aborted = False
                 break
             else:
                 test.getResult().setStartTimestamp(time.time())
                 test.execute() #cuando se usaria cleanup? y que hace?
                 test.getResult().setEndTimestamp(time.time())
                 self.nextIndexToExecute = self.nextIndexToExecute + 1
-        if self.paused == False and self.abort == False:
+        if self.paused is False and self.aborted is False:
             self.status = TBTAFExecutionStatusType.COMPLETED
             self.tbTestSuite.getSuiteResult().setEndTimestamp(time.time())
     
