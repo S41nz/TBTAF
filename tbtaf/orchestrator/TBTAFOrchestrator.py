@@ -20,7 +20,7 @@ from common.enums.filter_type import TBTAFFilterType
 
 #from interpreter.interpreter import TBInterpreter
 from discoverer.discoverer import TBTAFDiscoverer
-#from publisher.TBTAFPublisher import TBTAFPublisher
+from publisher.TBTAFPublisher import TBTAFPublisher
 from executor.Executor import TBTAFExecutor
 
 class TBTAFOrchestrator(object):
@@ -36,7 +36,7 @@ class TBTAFOrchestrator(object):
 			else:
 				print 'Error: TBTAFOrchestrator.__init__'
 
-	def addProject(newProject):
+	def addProject(self, newProject):
 		self.projectList.append(newProject)
 	
 	def createNewProject(self, tBTestSuiteInstance, tBTestBedInstance, projectName):
@@ -109,7 +109,7 @@ class TBTAFOrchestrator(object):
 					_smartTestSuite.addTestCaseList(testCaseList)
 					
 					filteredTestCases = _testSuite.getTestCases(tagList, TBTAFFilterType.IN)
-					_smartTestSuite.removeTestCaseList()
+					_smartTestSuite.clearTestCaseList()
 					_smartTestSuite.addTestCaseList(filteredTestCases)
 					
 					print 'Test ', testSuiteID, ' loaded from: ', filePath
@@ -119,26 +119,26 @@ class TBTAFOrchestrator(object):
 	#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the test plan will be generated.
 	#testPlanLocation - String specifying the location where the test plan wants to be placed.
 	#outputFormat - Enumeration flag specifying the output format of the created test plan.
-	'''
+
 	def publishTestPlan(self, tbTestSuiteInstance, testPlanLocation, outputFormat = 'html'):
 		#_publisher = TBTAFPublisher()
 		TBTAFPublisher().PublishTestPlan(tbTestSuiteInstance, testPlanLocation, outputFormat)
-	'''
+
 	#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the result report will be generated.
 	#resultLocation - String specifying the location where the result report wants to be placed.
 	#outputFormat - Enumeration flag specifying the output format of the created result report.
-	'''
+
 	def publishResultReport(self, tbTestSuiteInstance, resultLocation, outputFormat = 'html'):
 		TBTAFPublisher().PublishResultReport(tbTestSuiteInstance, resultLocation, outputFormat)
-	'''
+
 	#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the result report will be generated.
         #tbTestSuiteInstance - Reference of the TBTestSuite representing the set of tests that will be executed.
         #urlCollection - Optional collection of URLs corresponding to the nodes on which the test execution will be distributed.
         #flagsCollection - Optional collection of flags that can customize the execution of such TBTestSuite.
         #executorListenerCollection - Optional collection of ExecutorListener implementations that would want to listen and react to specific events during the execution of that specific TBTestSuite
-	def excuteTestSuite(self, tbTestSuiteInstance, urlCollection, flagsCollection, executorListenerCollection):
+	def executeTestSuite(self, tbTestSuiteInstance, testBed, flagsCollection = [], executorListenerCollection = []):
 		#tbtafExecutorInstance = TBTAFExecutor()
-		return TBTAFExecutor().ExecuteTests(tbTestSuiteInstance, urlCollection, flagsCollection, executorListenerCollection)
+		return TBTAFExecutor().executeTests(tbTestSuiteInstance, testBed, flagsCollection, executorListenerCollection)
 	
         #projectName - String identifying the Project from where the query is being made.
         #tagList - Optional List of tags in order to filter the query being made.
@@ -192,7 +192,7 @@ class TBTAFOrchestrator(object):
 				#Should I return list of Test Files or list of Test Cases objects?
 				return d  
 				
-	def getTestsForTag(testList, tag): 
+	def getTestsForTag(self, testList, tag): 
 		'''
 		Method to obtain the tests that contain the tag from the input
 		'''
