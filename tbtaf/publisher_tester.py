@@ -48,7 +48,11 @@ myTestSuite.addTestCase(myTestCase2)
 
 #create publisher instance and publish test plan
 myPublisher = TBTAFPublisher()
-myPublisher.PublishTestPlan(myTestSuite, "x", "x")
+
+#test IllegalArgumentException
+#myPublisher.PublishTestPlan(myTestSuite, "/asd/asd.html", "html")
+
+myPublisher.PublishTestPlan(myTestSuite, "test_plan.html", "html")
 
 #publishResultReport
 myPublisher.PublishResultReport(myTestSuite, "result_report.html", "html")
