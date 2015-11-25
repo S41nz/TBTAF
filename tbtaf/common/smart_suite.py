@@ -75,8 +75,8 @@ class TBSmartTestSuite(TBTestSuite):
         selectedTestCases = self.getTestCases(tags,queryFilter)
         
         candidateVerdict = TBTAFVerdictType.INCONCLUSIVE
-        startTimestamp = sys.maxsize
-        endTimestamp = 0
+        startTimestamp = datetime.datetime.max
+        endTimestamp = datetime.datetime.min
         passTests = 0
         inconclusiveTests = 0
         failedTests = 0

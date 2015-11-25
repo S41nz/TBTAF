@@ -24,8 +24,12 @@ class TBTAFPublisher(object):
         based on the discovered metadata
         '''
 
-        if formatFlag != "html":
+        if formatFlag.lower()  != "html":
             print "Format " + formatFlag + " is not supported"
+            raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
+        
+        if not filePath.lower().endswith(".html"):
+            print "The file path doesn't contain a valid html file"
             raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
 
         try:
@@ -81,9 +85,14 @@ class TBTAFPublisher(object):
         based on the execution result of a given test suite
         '''
 
-        if formatFlag != "html":
+        if formatFlag.lower()  != "html":
             print "Format " + formatFlag + " is not supported"
             raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
+        
+        if not filePath.lower().endswith(".html"):
+            print "The file path doesn't contain a valid html file"
+            raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
+
 
         try:
             htmlFile = open(filePath,'w+')
