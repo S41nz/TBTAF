@@ -5,8 +5,8 @@ Created on 07/11/2015
 '''
 import datetime
 import os
-from IllegalArgumentException import IllegalArgumentException
-from NonSupportedFormatException import NonSupportedFormatException
+from common.exception.IllegalArgumentException import IllegalArgumentException
+from common.exception.NonSupportedFormatException import NonSupportedFormatException
 #class TBTAFPublisher():
 class TBTAFPublisher(object):
     '''
@@ -41,7 +41,6 @@ class TBTAFPublisher(object):
         s_tests = ""
         
         #Iterate over test cases and retrieve test metadata
-        
         testCasesList = tBTestSuiteInstance.getTestCases();
         
         for testCase in testCasesList:
@@ -66,6 +65,11 @@ class TBTAFPublisher(object):
             #Add close table row tag to HTML
             s_tests = s_tests + "</tr>"
         
+        #Calculate report time
+        reportTime = datetime.datetime.now()
+        s_reportTime = reportTime.strftime('%B %d,%Y %H:%M:%S')
+        #Replace strings in HTML file
+        htmlString = htmlString.replace('r_report_time',s_reportTime)
         htmlString = htmlString.replace('r_tests',s_tests)
         
         htmlFile.write(htmlString)
