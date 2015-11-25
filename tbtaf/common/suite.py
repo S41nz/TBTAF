@@ -57,7 +57,7 @@ class TBTestSuite(object):
         for newTestCase in newTestCaseList:
             self.suiteTestCases.append(newTestCase)
 
-    def removeTestCaseList(self):
+    def clearTestCaseList(self):
         suiteTestCases = []
     
     def getSuiteTrace(self):

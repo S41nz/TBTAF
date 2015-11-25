@@ -19,7 +19,7 @@ class TBProject(object):
         '''
         self.tbTestSuite = tbTestSuite
         self.tbTestBed = tbTestBed
-    self.projectName = projectName
+        self.projectName = projectName
     
     def getTBTestSuite(self):
         '''
