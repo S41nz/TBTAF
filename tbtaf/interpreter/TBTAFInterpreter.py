@@ -11,7 +11,9 @@ from result import Result
 from status import TBTAFParsingScriptStatus
 from parsing_summary import ParsingSummary
 from common.enums.filter_type import TBTAFFilterType
-from orchestrator.TBTAFOrchestrator import TBTAFOrchestrator
+import orchestrator.TBTAFOrchestrator
+from common.exception.IllegalArgumentException import IllegalArgumentException
+from common.exception.NonSupportedFormatException import NonSupportedFormatException
 
 class TBTAFInterpreter(object):
     '''
