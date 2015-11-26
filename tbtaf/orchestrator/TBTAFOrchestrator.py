@@ -205,7 +205,7 @@ class TBTAFOrchestrator(object):
 				if testMetadata is not None:
 					testTags = testMetadata.getTags()
 					if tag in testTags and testMetadata.getAssetID() not in resultTestCases: #Should I verify for repeated asset ids in case the header of distinct test cases have exact same asset id values like -1?
-						resultTestCases.append(testMetadata.getAssetID())) #CHANGE testMetadata.getAssetID().					
+						resultTestCases.append(testMetadata.getAssetID()) #CHANGE testMetadata.getAssetID().					
 		return resultTestCases
 
 	#projectName - String describing the project from which the query is being made.
