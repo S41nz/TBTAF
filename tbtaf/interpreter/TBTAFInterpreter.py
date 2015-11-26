@@ -18,6 +18,7 @@ class TBTAFInterpreter(object):
         TBTAFInterpreter
     '''
 
+    OrchestratorReference = None
     summary = ParsingSummary()
     urlPattern = urlPattern = "(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?"
 
@@ -60,7 +61,7 @@ class TBTAFInterpreter(object):
 
     ##Patterns
     a = "(?P<variable>\w+)\s*=\s*(?P<method>\\create_test_bed\\b)(\("+ URL_LIST +"\))?"
-    b = "(?P<variable>\w+)\s*=\s*(?P<method>\\create_test_suite\\b)\("+ FILE_PATH +"(\,"+ TAG_LIST +")?\)"
+    b = "(?P<variable>\w+)\s*=\s*(?P<method>\\create_test_suite\\b)\(\s*"+ FILE_PATH +"(\,"+ TAG_LIST +")?\)"
     c = "(?P<method>\\create_new_project\\b)\("+ TEST_SUITE +","+ TEST_BED +","+ PROJECT_NAME +"\)"
     d = "(?P<method>\\publish test_plan\\b)\("+ TEST_SUITE +","+ FILE_PATH +","+ FORMAT +"\)"
     e = "(?P<variable>\w+)\s*=\s*(?P<method>\\execute\\b)\("+ TEST_SUITE +","+ TEST_BED +"\)"
@@ -78,7 +79,7 @@ class TBTAFInterpreter(object):
         return message.format(_type, str(fileName), str(lineNumber), message)
         ##return message.format("","","","")
 	
-    def _parseScript(self, scriptURL):
+    def parseScript(self, scriptURL):
         result = Result(TBTAFParsingScriptStatus.SUCCESS, "Success")
         file = None
         try:
@@ -86,10 +87,15 @@ class TBTAFInterpreter(object):
             if (self._parseFile(file, result) == -1):
                 file.close()
                 print(result.status)
-                print(result.message)
+                print(result.message)				               
                 return result
-        except Exception as e:
-            print str(e)
+            else:
+                if((result.status==TBTAFParsingScriptStatus.SUCCESS) and not(TBTAFInterpreter.OrchestratorReference is None)):                    
+                    self.startExecution(TBTAFInterpreter.OrchestratorReference)
+                else:
+                    raise ValueError("Reference not set")
+        except Exception as e:      
+            raise InvalidArgumentException(e)
         finally:
             if(file is not None):
                 file.close()
@@ -212,8 +218,7 @@ class TBTAFInterpreter(object):
         return error
 
     def setOrchestratorReference(self, orchestrator):
-        self.startExecution(orchestrator)
-        pass
+        TBTAFInterpreter.OrchestratorReference=orchestrator       
 
     def startExecution(self,orchestrator):
         objs = {}
@@ -259,8 +264,9 @@ class TBTAFInterpreter(object):
 
                 orchestrator.createNewProject(testSuite, testBed, projectName)
 
-        except (Exception) as e:
-        ##except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
+        #except (Exception) as e:
+        except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
+            print("hola")
             print self._formatMsg(fileName, lineNumber, "Fatal Error. Execution cannot continue. " + str(e), TBTAFInterpreter.MSG_ERROR)
 
         #PublishTestPlan
@@ -275,8 +281,8 @@ class TBTAFInterpreter(object):
 
                 orchestrator.PublishTestPlan(testSuite, filePath, format)
 
-        except (ValueError) as e:
-        ##except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
+        #except (ValueError) as e:
+        except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
             print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
 
         #PublishResultReport
@@ -290,8 +296,8 @@ class TBTAFInterpreter(object):
                 format = var[TBTAFInterpreter.FORMAT_PARAM]
 
                 orchestrator.PublishResultReport(testSuite, filePath, format)
-        except (ValueError) as e:
-        ##except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
+        #except (ValueError) as e:
+        except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
             print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
 
         #ExecuteTests
@@ -348,4 +354,3 @@ class TBTAFInterpreter(object):
 
         except ValueError as e:
             print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
-
