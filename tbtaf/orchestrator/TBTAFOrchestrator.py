@@ -1,13 +1,12 @@
 '''
 Created on 02/11/2015
 
-@author: S41nz
+@author: 
 '''
 
 import httplib
 import os
 import urlparse
-#import sys
 
 from common.test_bed import TBTestBed
 from common.project import TBProject
@@ -18,7 +17,7 @@ from common.smart_suite import TBSmartTestSuite
 from common.enums.suite_type import TBTAFTestSuiteType
 from common.enums.filter_type import TBTAFFilterType
 
-#from interpreter.interpreter import TBInterpreter
+from interpreter.TBTAFInterpreter import TBTAFInterpreter
 from discoverer.discoverer import TBTAFDiscoverer
 from publisher.TBTAFPublisher import TBTAFPublisher
 from executor.Executor import TBTAFExecutor
@@ -55,10 +54,11 @@ class TBTAFOrchestrator(object):
 				#Duda: Que pasa si llamamos a gestTestCases() para un smart suite... se corre el de TBTestSuite o de TBSmartTestSuite?
 				print 'Number of tests: ', len(tBTestSuiteInstance.getTestCases()) 
 				print 'Execution nodes: ', ', '.join([testNode.getNodeURL() for testNode in tBTestBedInstance.getTestBedNodes()])
-	'''
+
 	def parseScript(self, filePath):
-		return TBTAFInterpreter().parseScript(filePath)
-	'''
+		_interpreter = TBTAFInterpreter()
+		_interpreter.setOrchestratorReference(self)
+		return _interpreter.parseScript(filePath)
     
 	def createTestBed(self, urlList = ['http://localhost']):
 		tBtestBedInstance = TBTestBed()
@@ -131,12 +131,12 @@ class TBTAFOrchestrator(object):
 	def publishResultReport(self, tbTestSuiteInstance, resultLocation, outputFormat = 'html'):
 		TBTAFPublisher().PublishResultReport(tbTestSuiteInstance, resultLocation, outputFormat)
 
-	#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the result report will be generated.
+		#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the result report will be generated.
         #tbTestSuiteInstance - Reference of the TBTestSuite representing the set of tests that will be executed.
         #urlCollection - Optional collection of URLs corresponding to the nodes on which the test execution will be distributed.
         #flagsCollection - Optional collection of flags that can customize the execution of such TBTestSuite.
         #executorListenerCollection - Optional collection of ExecutorListener implementations that would want to listen and react to specific events during the execution of that specific TBTestSuite
-	def executeTestSuite(self, tbTestSuiteInstance, testBed, flagsCollection = [], executorListenerCollection = []):
+	def executeTestSuite(self, tbTestSuiteInstance, testBed = "dummy", flagsCollection = [], executorListenerCollection = []):
 		#tbtafExecutorInstance = TBTAFExecutor()
 		return TBTAFExecutor().executeTests(tbTestSuiteInstance, testBed, flagsCollection, executorListenerCollection)
 	
@@ -187,9 +187,8 @@ class TBTAFOrchestrator(object):
 				d = {}
 				for tag in tagDictionary:
 					d[tag] = self.getTestsForTag(queriedTests, tag)
-				for tagkey, testList in d.items():
-					print tagkey, ': ', ', '.join(testList) #Crear mas bien lista de Test Files o Test IDs. Hay un atributo con test file o test id en TBTestCase?
-				#Should I return list of Test Files or list of Test Cases objects?
+				for tagkey, testIds in d.items(): #CHANGE testIds
+					print tagkey, ': ', ', '.join(str(x) for x in testIds)
 				return d  
 				
 	def getTestsForTag(self, testList, tag): 
@@ -205,8 +204,8 @@ class TBTAFOrchestrator(object):
 				testMetadata = candidateTest.getTestMetadata()
 				if testMetadata is not None:
 					testTags = testMetadata.getTags()
-					if tag in testTags:
-						resultTestCases.append(candidateTest)
+					if tag in testTags and testMetadata.getAssetID() not in resultTestCases: #Should I verify for repeated asset ids in case the header of distinct test cases have exact same asset id values like -1?
+						resultTestCases.append(testMetadata.getAssetID()) #CHANGE testMetadata.getAssetID().					
 		return resultTestCases
 
 	#projectName - String describing the project from which the query is being made.
