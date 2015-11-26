@@ -97,11 +97,13 @@ class TBSmartTestSuite(TBTestSuite):
                     elif testVerdict == TBTAFVerdictType.PASS:
                         passTests = passTests + 1
                     #Calculate the timestamps
-                    if startTimestamp > currentResult.getStartTimestamp():
-                        startTimestamp = currentResult.getStartTimestamp()
+                    if currentResult.getStartTimestamp() is not None:
+                        if startTimestamp > currentResult.getStartTimestamp():
+                            startTimestamp = currentResult.getStartTimestamp()
                         
-                    if endTimestamp < currentResult.getEndTimestamp():
-                        endTimestamp = currentResult.getEndTimestamp()
+                    if currentResult.getEndTimestamp() is not None:
+                        if endTimestamp < currentResult.getEndTimestamp():
+                            endTimestamp = currentResult.getEndTimestamp()
                     
                 else:
                     inconclusiveTests = inconclusiveTests + 1
