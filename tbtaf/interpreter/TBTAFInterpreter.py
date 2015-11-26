@@ -63,7 +63,7 @@ class TBTAFInterpreter(object):
 
     ##Patterns
     a = "(?P<variable>\w+)\s*=\s*(?P<method>\\create_test_bed\\b)(\("+ URL_LIST +"\))?"
-    b = "(?P<variable>\w+)\s*=\s*(?P<method>\\create_test_suite\\b)\(\s*"+ FILE_PATH +"(\,"+ TAG_LIST +")?\)"
+    b = "(?P<variable>\w+)\s*=\s*(?P<method>\\create_test_suite\\b)\("+ FILE_PATH +"(\,"+ TAG_LIST +")?\)"
     c = "(?P<method>\\create_new_project\\b)\("+ TEST_SUITE +","+ TEST_BED +","+ PROJECT_NAME +"\)"
     d = "(?P<method>\\publish test_plan\\b)\("+ TEST_SUITE +","+ FILE_PATH +","+ FORMAT +"\)"
     e = "(?P<variable>\w+)\s*=\s*(?P<method>\\execute\\b)\("+ TEST_SUITE +","+ TEST_BED +"\)"
