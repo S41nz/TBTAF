@@ -6,7 +6,6 @@ import glob
 import importlib
 import inspect
 import logging
-import re
 import sys
 import os
 import xml.etree.ElementTree
@@ -183,11 +182,11 @@ class TBTAFDiscoverer():
         if assetID is not None and assetID.text is not None :
             md.setAssetID(int(assetID.text))
         else:
-            md.setAssetID(None)
+            md.setAssetID(TBMetadata.NON_INITIALIZED)
         if tags.text is not None :
-            md.setTags(re.split(', ',tags.text))
+            md.setTags([t.strip() for t in tags.text.split(',')])
         else:
-            md.setTags(None)
+            md.setTags([])
         if priority is not None and priority.text is not None:
             md.setPriority(int(priority.text))
         else:

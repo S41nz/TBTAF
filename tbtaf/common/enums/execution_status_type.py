@@ -4,4 +4,5 @@ class TBTAFExecutionStatusType(object):
     PAUSED="Paused"
     ABORTED="Aborted"
     COMPLETED="Completed"
-    
+    PAUSING="Pausing"
+    ABORTING="Aborting"

@@ -5,8 +5,8 @@ Created on 07/11/2015
 '''
 import datetime
 import os
-from IllegalArgumentException import IllegalArgumentException
-from NonSupportedFormatException import NonSupportedFormatException
+from common.exception.IllegalArgumentException import IllegalArgumentException
+from common.exception.NonSupportedFormatException import NonSupportedFormatException
 #class TBTAFPublisher():
 class TBTAFPublisher(object):
     '''
@@ -24,8 +24,12 @@ class TBTAFPublisher(object):
         based on the discovered metadata
         '''
 
-        if formatFlag != "html":
+        if formatFlag.lower()  != "html":
             print "Format " + formatFlag + " is not supported"
+            raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
+        
+        if not filePath.lower().endswith(".html"):
+            print "The file path doesn't contain a valid html file"
             raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
 
         try:
@@ -41,7 +45,6 @@ class TBTAFPublisher(object):
         s_tests = ""
         
         #Iterate over test cases and retrieve test metadata
-        
         testCasesList = tBTestSuiteInstance.getTestCases();
         
         for testCase in testCasesList:
@@ -66,6 +69,11 @@ class TBTAFPublisher(object):
             #Add close table row tag to HTML
             s_tests = s_tests + "</tr>"
         
+        #Calculate report time
+        reportTime = datetime.datetime.now()
+        s_reportTime = reportTime.strftime('%B %d,%Y %H:%M:%S')
+        #Replace strings in HTML file
+        htmlString = htmlString.replace('r_report_time',s_reportTime)
         htmlString = htmlString.replace('r_tests',s_tests)
         
         htmlFile.write(htmlString)
@@ -77,9 +85,14 @@ class TBTAFPublisher(object):
         based on the execution result of a given test suite
         '''
 
-        if formatFlag != "html":
+        if formatFlag.lower()  != "html":
             print "Format " + formatFlag + " is not supported"
             raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
+        
+        if not filePath.lower().endswith(".html"):
+            print "The file path doesn't contain a valid html file"
+            raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
+
 
         try:
             htmlFile = open(filePath,'w+')

@@ -19,6 +19,10 @@ class TBTAFExecutionStatus:
         return self.suiteResult
         
     def getCompletionPercentage(self):
+        if self.testCasesExecuted is None:
+            raise Exception("testCasesExecuted value must be set before using this method")
+        if self.testCasesTotal is None:
+            raise Exception("testCasesTotal value must be set before using this method")
         percentage = round(self.testCasesExecuted * 100 / self.testCasesTotal, 2)
         return percentage
     
