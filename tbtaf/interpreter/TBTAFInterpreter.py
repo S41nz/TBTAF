@@ -49,7 +49,7 @@ class TBTAFInterpreter(object):
     FILE_PATH = "(?P<"+ FILE_PATH_PARAM +">(.*))"
     TEST_BED = "(?P<"+ TEST_BED_PARAM +">(\w+))"
     PROJECT_NAME = "\"(?P<"+ PROJECT_NAME_PARAM +">(.*))\""
-    TAG_LIST = "\[(?P<"+ TAG_LIST_PARAM +">((<\w+>)(,<\w+>)*))\]"
+    TAG_LIST = "\[(?P<"+ TAG_LIST_PARAM +">((\"\w+\")(,\"\w+\")*))\]"
     FILTER = "(?P<"+ FILTER_PARAM +">(\w+))"
     FORMAT = "(?P<"+ FORMAT_PARAM +">(\w+))"
     URL_LIST = "(?P<"+ URL_LIST_PARAM +">(("+ urlPattern +")(,"+ urlPattern +")*))"
