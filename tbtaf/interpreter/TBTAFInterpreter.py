@@ -22,7 +22,7 @@ class TBTAFInterpreter(object):
 
     OrchestratorReference = None
     summary = ParsingSummary()
-    urlPattern = urlPattern = "(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?"
+    urlPattern = urlPattern = "\"(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?\""
 
     ##Params in commands
     TEST_SUITE_PARAM = "testSuite"
@@ -30,6 +30,8 @@ class TBTAFInterpreter(object):
     TEST_BED_PARAM = "testBed"
     PROJECT_NAME_PARAM = "projectName"
     TAG_LIST_PARAM = "tagList"
+    FLAG_LIST_PARAM_1 = "flagList1"
+    FLAG_LIST_PARAM_2 = "flagList2"
     FILTER_PARAM = "filter"
     FORMAT_PARAM = "format"
     URL_LIST_PARAM = "urlList"
@@ -41,18 +43,21 @@ class TBTAFInterpreter(object):
     PUBLIS_TEST_PLAN = "publish test_plan"
     EXECUTE = "execute"
     PUBLISH_TEST_RESULT = "publish test_results"
-    GET_TEST = "get tests"
-    GET_TAGS = "get tags"
+    GET_TEST = "get_tests"
+    GET_TAGS = "get_tags"
 
     ##Patterns
     TEST_SUITE = "(?P<"+ TEST_SUITE_PARAM +">(\w+))"
-    FILE_PATH = "(?P<"+ FILE_PATH_PARAM +">(.*))"
+    FILE_PATH = "\"(?P<"+ FILE_PATH_PARAM +">(.+))\""
     TEST_BED = "(?P<"+ TEST_BED_PARAM +">(\w+))"
-    PROJECT_NAME = "\"(?P<"+ PROJECT_NAME_PARAM +">(.*))\""
+    PROJECT_NAME = "\"(?P<"+ PROJECT_NAME_PARAM +">(.+))\""
     TAG_LIST = "\[(?P<"+ TAG_LIST_PARAM +">((\"\w+\")(,\"\w+\")*))\]"
     FILTER = "(?P<"+ FILTER_PARAM +">(\w+))"
     FORMAT = "(?P<"+ FORMAT_PARAM +">(\w+))"
-    URL_LIST = "(?P<"+ URL_LIST_PARAM +">(("+ urlPattern +")(,"+ urlPattern +")*))"
+    FLAG_LIST_1 = "\[(?P<"+ FLAG_LIST_PARAM_1 +">((\w+)(,\w+)*))\]"
+    FLAG_LIST_2 = "\[(?P<"+ FLAG_LIST_PARAM_2 +">((\w+)(,\w+)*))\]"
+    ##URL_LIST = "(?P<"+ URL_LIST_PARAM +">(("+ urlPattern +")(,"+ urlPattern +")*))"
+    URL_LIST = "(?P<"+ URL_LIST_PARAM +">(("+ "\".+\"" +")(,"+ "\".+\"" +")*))"
 
     ##Message Types
     MSG_ERROR = "Error"
@@ -62,42 +67,52 @@ class TBTAFInterpreter(object):
     FILE_LINE_NUMBER = "lineNumber"
 
     ##Patterns
-    a = "(?P<variable>\w+)\s*=\s*(?P<method>\\create_test_bed\\b)(\("+ URL_LIST +"\))?"
-    b = "(?P<variable>\w+)\s*=\s*(?P<method>\\create_test_suite\\b)\("+ FILE_PATH +"(\,"+ TAG_LIST +")?\)"
+    a = "(?P<variable>\w+)\s*=\s*(?P<method>\\create_test_bed\\b)\(("+ URL_LIST +")?\)"
+    b = "(?P<variable>\w+)\s*=\s*(?P<method>\\create_test_suite\\b)\("+ FILE_PATH +"(,"+ TAG_LIST +")?\)"
     c = "(?P<method>\\create_new_project\\b)\("+ TEST_SUITE +","+ TEST_BED +","+ PROJECT_NAME +"\)"
     d = "(?P<method>\\publish test_plan\\b)\("+ TEST_SUITE +","+ FILE_PATH +","+ FORMAT +"\)"
-    e = "(?P<variable>\w+)\s*=\s*(?P<method>\\execute\\b)\("+ TEST_SUITE +","+ TEST_BED +"\)"
+    e = "(?P<variable>\w+)\s*=\s*(?P<method>\\execute\\b)\("+ TEST_SUITE +","+ TEST_BED +"(,"+ FLAG_LIST_1 +")?(,"+ FLAG_LIST_2 +")?\)"
     f = "(?P<method>\\publish test_results\\b)\("+ TEST_SUITE +","+ FILE_PATH +","+ FORMAT +"\)"
-    g = "(?P<method>\\get tests\\b)\("+ PROJECT_NAME +"((\,"+ TAG_LIST +"),"+ FILTER +")?\)"
-    h = "(?P<method>\\get tags\\b)\("+ PROJECT_NAME +"\)"
+    g = "(?P<method>\\get_tests\\b)\("+ PROJECT_NAME +"((\,"+ TAG_LIST +"),"+ FILTER +")?\)"
+    h = "(?P<method>\\get_tags\\b)\("+ PROJECT_NAME +"\)"
+
+    ##print c
 
     def __init__(self):
         '''
             Constructor
         '''
 
-    def _formatMsg(self,fileName, lineNumber, message, _type):
-        #message = "{} :     File \"{}}\",line {}}\nDescription: {}}\n"
-        return message.format(_type, str(fileName), str(lineNumber), message)
+    def _formatMsg(self,fileName, lineNumber, text, _type):
+        message = "{} :     File {},line {},Description: {}\n"
+        return message.format(_type, str(fileName), str(lineNumber), text)
         ##return message.format("","","","")
-	
+
     def parseScript(self, scriptURL):
         result = Result(TBTAFParsingScriptStatus.SUCCESS, "Success")
         file = None
         try:
             file = self._openFile(scriptURL)
-            if (self._parseFile(file, result) == -1):
+            self._parseFile(file, result)
+
+            if (result.status==TBTAFParsingScriptStatus.ERROR):
                 file.close()
-                print(result.status)
-                print(result.message)				               
-                return result
+                ##return result
             else:
-                if((result.status==TBTAFParsingScriptStatus.SUCCESS) and not(TBTAFInterpreter.OrchestratorReference is None)):                    
+                if (TBTAFInterpreter.OrchestratorReference is None):
+                    result.status=TBTAFParsingScriptStatus.ERROR
+                    result.message="Orchestrator Reference has not been set."
+                    ##return result
+
+                if(result.status==TBTAFParsingScriptStatus.SUCCESS):
                     self.startExecution(TBTAFInterpreter.OrchestratorReference)
-                else:
-                    raise ValueError("Reference not set")
-        except Exception as e:      
-            raise InvalidArgumentException(e)
+
+            #print result.status
+            #print result.message
+
+        except Exception as e:
+            #traceback.print_exc(e)
+            raise e
         finally:
             if(file is not None):
                 file.close()
@@ -128,37 +143,48 @@ class TBTAFInterpreter(object):
         """
         """
         ##________Dict for calling each regular expression________
-        mappingPatterns   = {TBTAFInterpreter.CREATE_TEST_BED  :TBTAFInterpreter.a,TBTAFInterpreter.CREATE_TEST_SUITE:TBTAFInterpreter.b ,TBTAFInterpreter.CREATE_NEW_PROJECT  :TBTAFInterpreter.c,
-                      TBTAFInterpreter.PUBLIS_TEST_PLAN:TBTAFInterpreter.d,TBTAFInterpreter.EXECUTE          :TBTAFInterpreter.e ,TBTAFInterpreter.PUBLISH_TEST_RESULT:TBTAFInterpreter.f,
-                      TBTAFInterpreter.GET_TEST        :TBTAFInterpreter.g,TBTAFInterpreter.GET_TAGS         :TBTAFInterpreter.h}
+        mappingPatterns   = {
+        TBTAFInterpreter.CREATE_TEST_BED    :TBTAFInterpreter.a,
+        TBTAFInterpreter.CREATE_TEST_SUITE  :TBTAFInterpreter.b,
+        TBTAFInterpreter.CREATE_NEW_PROJECT :TBTAFInterpreter.c,
+        TBTAFInterpreter.PUBLIS_TEST_PLAN   :TBTAFInterpreter.d,
+        TBTAFInterpreter.EXECUTE            :TBTAFInterpreter.e,
+        TBTAFInterpreter.PUBLISH_TEST_RESULT:TBTAFInterpreter.f,
+        TBTAFInterpreter.GET_TEST           :TBTAFInterpreter.g,
+        TBTAFInterpreter.GET_TAGS           :TBTAFInterpreter.h}
 
         ##________Read each line of the file and look for a match of defined methods________
         for i, line in enumerate(file):
             ##________Delete White Spaces from the corners________
             line = line.strip()
+            fileName = file.name
+            lineNumber = i + 1
+
             if (line == ""):
-                pass
+                continue
             elif (line.startswith("//")):
-                pass
+                continue
 
             for command in mappingPatterns:
                 if (command in line):
                     m = re.match(mappingPatterns[command],line)
-                    fileName = file.name
-                    lineNumber = i + 1
 
                     if (m is None):
                         result.status  = TBTAFParsingScriptStatus.ERROR
                         result.message = self._formatMsg(fileName, lineNumber, "Cannot find command", TBTAFInterpreter.MSG_ERROR)
                     else:
                         m = m.groupdict()
-                        ##print("Matched method = " + str(method))
-                        ##print(str(m))
                         error = self._addToSummary(m, fileName, lineNumber)
-                        if(error != ""):
+                        if(error == ""):
+                            break
+                        else:
                             result.status  = TBTAFParsingScriptStatus.ERROR
                             result.message = error
                             return -1
+            else:
+                result.status  = TBTAFParsingScriptStatus.ERROR
+                result.message = self._formatMsg(fileName, lineNumber, "Malformed command", TBTAFInterpreter.MSG_ERROR)
+                return -1
 
     def _addToSummary(self,m, fileName, lineNumber):
         m[TBTAFInterpreter.FILE_NAME] = fileName
@@ -176,51 +202,51 @@ class TBTAFInterpreter(object):
         elif (command == TBTAFInterpreter.CREATE_NEW_PROJECT):
             if not(m[TBTAFInterpreter.TEST_SUITE_PARAM] in TBTAFInterpreter.summary.createTestSuite):
                 error = error.format(m[TBTAFInterpreter.TEST_SUITE_PARAM])
-                return formatMsg(fileName, index, error, TBTAFInterpreter.MSG_ERROR)
+                return self._formatMsg(fileName, lineNumber, error, TBTAFInterpreter.MSG_ERROR)
             if not(m[TBTAFInterpreter.TEST_BED_PARAM] in TBTAFInterpreter.summary.createTestBed):
                 error = error.format(m[TBTAFInterpreter.TEST_BED_PARAM])
-                return formatMsg(fileName, index, error, TBTAFInterpreter.MSG_ERROR)
+                return self._formatMsg(fileName, lineNumber, error, TBTAFInterpreter.MSG_ERROR)
 
             TBTAFInterpreter.summary.createNewProject[m[TBTAFInterpreter.PROJECT_NAME_PARAM]] = m
 
         elif (command == TBTAFInterpreter.PUBLIS_TEST_PLAN):
             if not(m[TBTAFInterpreter.TEST_SUITE_PARAM] in TBTAFInterpreter.summary.createTestSuite):
                 error = error.format(m[TBTAFInterpreter.TEST_SUITE_PARAM])
-                return formatMsg(fileName, index, error, TBTAFInterpreter.MSG_ERROR)
+                return self._formatMsg(fileName, lineNumber, error, TBTAFInterpreter.MSG_ERROR)
 
             TBTAFInterpreter.summary.publishTestPlan.append(m)
 
         elif (command == TBTAFInterpreter.EXECUTE):
             if not(m[TBTAFInterpreter.TEST_SUITE_PARAM] in TBTAFInterpreter.summary.createTestSuite):
                 error = error.format(m[TBTAFInterpreter.TEST_SUITE_PARAM])
-                return formatMsg(fileName, index, error, TBTAFInterpreter.MSG_ERROR)
+                return self._formatMsg(fileName, lineNumber, error, TBTAFInterpreter.MSG_ERROR)
 
             TBTAFInterpreter.summary.execute[m["variable"]] = m
 
         elif (command == TBTAFInterpreter.PUBLISH_TEST_RESULT):
             if not(m[TBTAFInterpreter.TEST_SUITE_PARAM] in TBTAFInterpreter.summary.createTestSuite):
                 error = error.format(m[TBTAFInterpreter.TEST_SUITE_PARAM])
-                return formatMsg(fileName, index, error, TBTAFInterpreter.MSG_ERROR)
+                return self._formatMsg(fileName, lineNumber, error, TBTAFInterpreter.MSG_ERROR)
 
             TBTAFInterpreter.summary.publishTestResults.append(m)
 
         elif (command == TBTAFInterpreter.GET_TEST):
             if not(m[TBTAFInterpreter.PROJECT_NAME_PARAM] in TBTAFInterpreter.summary.createNewProject):
                 error = error.format(m[TBTAFInterpreter.PROJECT_NAME_PARAM])
-                return formatMsg(fileName, index, error, TBTAFInterpreter.MSG_ERROR)
+                return self._formatMsg(fileName, lineNumber, error, TBTAFInterpreter.MSG_ERROR)
 
             TBTAFInterpreter.summary.getTest.append(m)
         elif (command ==TBTAFInterpreter.GET_TAGS):
             if not(m[TBTAFInterpreter.PROJECT_NAME_PARAM] in TBTAFInterpreter.summary.createNewProject):
                 error = error.format(m[TBTAFInterpreter.PROJECT_NAME_PARAM])
-                return formatMsg(fileName, index, error, TBTAFInterpreter.MSG_ERROR)
+                return self._formatMsg(fileName, lineNumber, error, TBTAFInterpreter.MSG_ERROR)
 
             TBTAFInterpreter.summary.getTags.append(m)
         error = ""
         return error
 
     def setOrchestratorReference(self, orchestrator):
-        TBTAFInterpreter.OrchestratorReference=orchestrator       
+        TBTAFInterpreter.OrchestratorReference=orchestrator
 
     def startExecution(self,orchestrator):
         objs = {}
@@ -239,6 +265,8 @@ class TBTAFInterpreter(object):
                 if(urlList is None):
                     objs[var] = orchestrator.createTestBed()
                 else:
+                    urlList = urlList.split(",")
+                    urlList = [url.replace('\"', '') for url in urlList]
                     objs[var] = orchestrator.createTestBed(urlList)
 
             #CreateTestSuite
@@ -251,6 +279,7 @@ class TBTAFInterpreter(object):
                 tagList = testSuites[var][TBTAFInterpreter.TAG_LIST_PARAM]
                 if not(tagList is None):
                     tagList = tagList.split(",")
+                    tagList = [tag.replace('\"', '') for tag in tagList]
 
                 objs[var] = orchestrator.createTestSuite(filePath, tagList)
 
@@ -266,9 +295,7 @@ class TBTAFInterpreter(object):
 
                 orchestrator.createNewProject(testSuite, testBed, projectName)
 
-        #except (Exception) as e:
         except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
-            print("hola")
             print self._formatMsg(fileName, lineNumber, "Fatal Error. Execution cannot continue. " + str(e), TBTAFInterpreter.MSG_ERROR)
 
         #PublishTestPlan
@@ -283,7 +310,6 @@ class TBTAFInterpreter(object):
 
                 orchestrator.PublishTestPlan(testSuite, filePath, format)
 
-        #except (ValueError) as e:
         except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
             print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
 
@@ -298,7 +324,7 @@ class TBTAFInterpreter(object):
                 format = var[TBTAFInterpreter.FORMAT_PARAM]
 
                 orchestrator.PublishResultReport(testSuite, filePath, format)
-        #except (ValueError) as e:
+				
         except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
             print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
 
@@ -313,7 +339,18 @@ class TBTAFInterpreter(object):
                 testSuite = objs[executions[var][TBTAFInterpreter.TEST_SUITE_PARAM]]
                 testBed = objs[executions[var][TBTAFInterpreter.TEST_SUITE_PARAM]]
 
-                objs[var] = orchestrator.executeTests(testSuite, testBed)
+                flagList1 = executions[var][TBTAFInterpreter.FLAG_LIST_PARAM_1]
+                flagList2 = executions[var][TBTAFInterpreter.FLAG_LIST_PARAM_2]
+
+                if not(flagList1 is None):
+                    flagList1 = flagList1.split(",")
+                    flagList1 = [flag.replace('\"', '') for flag in flagList1]
+
+                if not(flagList2 is None):
+                    flagList2 = flagList2.split(",")
+                    flagList2 = [flag.replace('\"', '') for flag in flagList2]
+
+                objs[var] = orchestrator.executeTests(testSuite, testBed, flagList1, flagList2)
         except ValueError as e:
             print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
 
@@ -328,6 +365,7 @@ class TBTAFInterpreter(object):
                 tagList = var[TBTAFInterpreter.TAG_LIST_PARAM]
                 if not(tagList is None):
                     tagList = tagList.split(",")
+                    tagList = [tag.replace('\"', '') for tag in tagList]
                 filter = var[TBTAFInterpreter.FILTER_PARAM]
                 if(filter == "IN"):
                     filter = TBTAFFilterType.IN
@@ -336,10 +374,10 @@ class TBTAFInterpreter(object):
                 else:
                     filter = None
 
-                if (tagList is None or _filter is None):
+                if (tagList is None or filter is None):
                     orchestrator.getTests(projectName)
                 else:
-                    orchestrator.getTests(projectName, tagList, _filter)
+                    orchestrator.getTests(projectName, tagList, filter)
 
         except ValueError as e:
             print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
