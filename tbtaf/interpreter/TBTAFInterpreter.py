@@ -57,7 +57,8 @@ class TBTAFInterpreter(object):
     FLAG_LIST_1 = "\[(?P<"+ FLAG_LIST_PARAM_1 +">((\w+)(,\w+)*))\]"
     FLAG_LIST_2 = "\[(?P<"+ FLAG_LIST_PARAM_2 +">((\w+)(,\w+)*))\]"
     ##URL_LIST = "(?P<"+ URL_LIST_PARAM +">(("+ urlPattern +")(,"+ urlPattern +")*))"
-    URL_LIST = "(?P<"+ URL_LIST_PARAM +">(("+ "\".+\"" +")(,"+ "\".+\"" +")*))"
+    ##URL_LIST = "(?P<"+ URL_LIST_PARAM +">(("+ "\".+\"" +")(,"+ "\".+\"" +")*))"
+    URL_LIST = "\[(?P<"+ URL_LIST_PARAM +">(("+ "\".+\"" +")(,"+ "\".+\"" +")*))\]"
 
     ##Message Types
     MSG_ERROR = "Error"
