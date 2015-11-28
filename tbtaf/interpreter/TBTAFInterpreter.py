@@ -309,7 +309,7 @@ class TBTAFInterpreter(object):
                 filePath = var[TBTAFInterpreter.FILE_PATH_PARAM]
                 format = var[TBTAFInterpreter.FORMAT_PARAM]
 
-                orchestrator.PublishTestPlan(testSuite, filePath, format)
+                orchestrator.publishTestPlan(objs[testSuite], filePath, format)
 
         except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
             print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
@@ -324,7 +324,7 @@ class TBTAFInterpreter(object):
                 filePath = var[TBTAFInterpreter.FILE_PATH_PARAM]
                 format = var[TBTAFInterpreter.FORMAT_PARAM]
 
-                orchestrator.PublishResultReport(testSuite, filePath, format)
+                orchestrator.publishResultReport(objs[testSuite], filePath, format)
 				
         except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
             print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
@@ -351,7 +351,7 @@ class TBTAFInterpreter(object):
                     flagList2 = flagList2.split(",")
                     flagList2 = [flag.replace('\"', '') for flag in flagList2]
 
-                objs[var] = orchestrator.executeTests(testSuite, testBed, flagList1, flagList2)
+                objs[var] = orchestrator.executeTestSuite(objs[testSuite], testBed, flagList1, flagList2)
         except ValueError as e:
             print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
 
