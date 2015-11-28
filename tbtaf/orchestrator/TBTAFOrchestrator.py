@@ -7,6 +7,7 @@ Created on 02/11/2015
 import httplib
 import os
 import urlparse
+import subprocess
 
 from common.test_bed import TBTestBed
 from common.project import TBProject
@@ -60,7 +61,7 @@ class TBTAFOrchestrator(object):
 		_interpreter.setOrchestratorReference(self)
 		return _interpreter.parseScript(filePath)
     
-	def createTestBed(self, urlList = ['http://localhost']):
+	def createTestBed(self, urlList = ['127.0.0.1']):
 		tBtestBedInstance = TBTestBed()
 		isValidUrlList = True
 		
@@ -267,30 +268,12 @@ class TBTAFOrchestrator(object):
 			return True
 		raise ValueError("Not Existing Project Exception")
 		return False
-			
-	def getServerStatusCode(self, url):
-		#https://pythonadventures.wordpress.com/2010/10/17/check-if-url-exists/
-		host, path = urlparse.urlparse(url)[1:3]
-		#print 'host', host
-		#print 'path', path
-		try:
-			conn = httplib.HTTPConnection(host)
-			conn.request('HEAD', path)
-			status = conn.getresponse().status
-			#print 'status:', status
-			conn.close()
-			return status
-		except StandardError:
-			#conn.close()
-			return None
-	 
+
 	def validateUrl(self, url):
-		#https://pythonadventures.wordpress.com/2010/10/17/check-if-url-exists/
-		good_codes = [httplib.OK, httplib.FOUND, httplib.MOVED_PERMANENTLY]
-		status = self.getServerStatusCode(url)
-		#print 'status:', status
-		valid = status in good_codes		
-		if not valid:		
+		DEVNULL = open(os.devnull, 'w')
+		response = subprocess.call("ping -n 1 " + url, stdout = DEVNULL, stderr = DEVNULL)
+		valid = response == 0
+		if not valid:
 			print 'Invalid URL:', url
 			raise ValueError(self.INVALID_ARGUMENT_EXCEPTION_TEXT)
 		return valid
