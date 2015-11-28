@@ -87,7 +87,6 @@ class TBTAFDiscoverer():
         ----If the provided locations are either null or non-existent then an
          Invalid Argument Exception will be thrown.
 
-        
         Process:
         ----(1) Cleans the path given and looks for the .py files
         ----(2) Imports the modules
@@ -149,7 +148,16 @@ class TBTAFDiscoverer():
         ----<t>: Metadata type according to caller.
         Outputs:
         ----TBMetadata instance containing the corresponding metadata.
-        ------None if no metadata was found or a required field was not found.
+        ------None if no metadata was found or a required field was empty or
+              not found.
+
+        Process:
+        ----(1) Loads XML data from string. May return with None.
+        ----(2) Based on the current specifications [1] do:
+        ----(2.1) Get metadata
+        ----(2.2) Confirm required info
+        ----(2.3) Fill TBMetadata instance, 
+        ----(2.3*) Assign the corresponding uninitialized value for empty tags.
         '''
         if s is None:
             logging.info("No metadata (no comment on first line) found in"
@@ -161,23 +169,21 @@ class TBTAFDiscoverer():
             logging.info("No metadata found in file " + f)
             return None
         
-        md = TBMetadata(TBTAFMetadataType.PRODUCT_CODE)
-        assetID = None
+        assetID = e.find("TestID")
+        tags = e.find("Tags")
+        priority = e.find("Priority")
+        assetDescription = e.find("Description")
+        
         if t == TBTAFMetadataType.TEST_CODE:
-            assetID = e.find("TestID")
-            if assetID is None : # Required but not found. Fail gracefully
+            if assetID is None or assetID.text is None :
                 logging.info("ID (required) not found in file " + f)
                 return None
             md = TBMetadata(TBTAFMetadataType.TEST_CODE)
         else:
             md = TBMetadata(TBTAFMetadataType.PRODUCT_CODE)
-
-        tags = e.find("Tags")
-        if tags is None : # Required but not found. Fail gracefully
+        if tags is None or tags.text is None :
             logging.info("Tags (required) not found in file " + f)
             return None
-        priority = e.find("Priority")
-        assetDescription = e.find("Description")
         
         if assetID is not None and assetID.text is not None :
             md.setAssetID(int(assetID.text))
@@ -190,11 +196,11 @@ class TBTAFDiscoverer():
         if priority is not None and priority.text is not None:
             md.setPriority(int(priority.text))
         else:
-            md.setPriority(None)
+            md.setPriority(TBMetadata.NON_INITIALIZED)
         if assetDescription is not None and assetDescription.text is not None:
             md.setAssetDescription(assetDescription.text)
         else:
-            md.setAssetDescription(None)
+            md.setAssetDescription('')
         return md
     
     @staticmethod
