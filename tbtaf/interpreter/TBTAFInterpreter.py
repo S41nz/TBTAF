@@ -299,36 +299,6 @@ class TBTAFInterpreter(object):
         except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
             print self._formatMsg(fileName, lineNumber, "Fatal Error. Execution cannot continue. " + str(e), TBTAFInterpreter.MSG_ERROR)
 
-        #PublishTestPlan
-        try:
-            for var in TBTAFInterpreter.summary.publishTestPlan:
-                fileName = var[TBTAFInterpreter.FILE_NAME]
-                lineNumber = var[TBTAFInterpreter.FILE_LINE_NUMBER]
-
-                testSuite = var[TBTAFInterpreter.TEST_SUITE_PARAM]
-                filePath = var[TBTAFInterpreter.FILE_PATH_PARAM]
-                format = var[TBTAFInterpreter.FORMAT_PARAM]
-
-                orchestrator.publishTestPlan(objs[testSuite], filePath, format)
-
-        except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
-
-        #PublishResultReport
-        try:
-            for var in TBTAFInterpreter.summary.publishTestResults:
-                fileName = var[TBTAFInterpreter.FILE_NAME]
-                lineNumber = var[TBTAFInterpreter.FILE_LINE_NUMBER]
-
-                testSuite = var[TBTAFInterpreter.TEST_SUITE_PARAM]
-                filePath = var[TBTAFInterpreter.FILE_PATH_PARAM]
-                format = var[TBTAFInterpreter.FORMAT_PARAM]
-
-                orchestrator.publishResultReport(objs[testSuite], filePath, format)
-				
-        except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
-
         #ExecuteTests
         try:
             #TBTAFInterpreter.summary.execute = executions
@@ -351,10 +321,42 @@ class TBTAFInterpreter(object):
                     flagList2 = flagList2.split(",")
                     flagList2 = [flag.replace('\"', '') for flag in flagList2]
 
-                objs[var] = orchestrator.executeTestSuite(objs[testSuite], testBed, flagList1, flagList2)
+                objs[var] = orchestrator.executeTestSuite(testSuite, testBed, flagList1, flagList2)
+
         except ValueError as e:
+            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_ERROR)
+            return
+
+        #PublishTestPlan
+        try:
+            for var in TBTAFInterpreter.summary.publishTestPlan:
+                fileName = var[TBTAFInterpreter.FILE_NAME]
+                lineNumber = var[TBTAFInterpreter.FILE_LINE_NUMBER]
+
+                #testSuite = var[TBTAFInterpreter.TEST_SUITE_PARAM]
+                testSuite= objs[var[TBTAFInterpreter.TEST_SUITE_PARAM]]
+                filePath = var[TBTAFInterpreter.FILE_PATH_PARAM]
+                format = var[TBTAFInterpreter.FORMAT_PARAM]
+
+                orchestrator.publishTestPlan(testSuite, filePath, format)
+
+        except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
             print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
 
+        #PublishResultReport
+        try:
+            for var in TBTAFInterpreter.summary.publishTestResults:
+                fileName = var[TBTAFInterpreter.FILE_NAME]
+                lineNumber = var[TBTAFInterpreter.FILE_LINE_NUMBER]
+
+                testSuite= objs[var[TBTAFInterpreter.TEST_SUITE_PARAM]]
+                filePath = var[TBTAFInterpreter.FILE_PATH_PARAM]
+                format = var[TBTAFInterpreter.FORMAT_PARAM]
+
+                orchestrator.publishResultReport(testSuite, filePath, format)
+				
+        except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
+            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
 
         #GetTests
         try:
