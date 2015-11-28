@@ -5,12 +5,12 @@
 //3.-Create a TBTAF project to be stored in DB
 //4.-Publish the test plan based on the created test suite
 
-myTestBed = create_test_bed("localhost")
+myTestBed = create_test_bed()
 //After the command above the following output on console is expected:
 //New test bed created on: localhost
 
 //Replace TEST_CONTENT_LOCATION by the actual location on the repo for the test TBTestCases
-myTestSuite = create_test_suite(TEST_CONTENT_LOCATION)
+myTestSuite = create_test_suite("C:\\Users\\psainza\\Documents\\TBTAF\\TBTAF\\tbtaf\\test\\discoverer\\samples")
 //After the command above the following output on console is expected:
 // For each discovered test
 // Test <Test ID> loaded from: <Complete test filepath>
@@ -25,6 +25,6 @@ create_new_project(myTestSuite,myTestBed,"TBTAF Smoke test project 02")
 //Execution nodes: localhost
 
 //Replace TEST_PLAN_LOCATION by the actual location on the repo for the test plan HTML
-publish test_plan(myTestSuite,TEST_PLAN_LOCATION)
+publish test_plan(myTestSuite,"C:\\Users\\psainza\\Documents\\TBTAF\\TBTAF\\tbtaf\\test\\discoverer\\samples\\SmokeTestReport.html",HTML)
 //After the command above the following output on console is expected:
 //Test plan published at: TEST_PLAN_LOCATION
