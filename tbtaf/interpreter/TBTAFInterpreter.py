@@ -316,10 +316,14 @@ class TBTAFInterpreter(object):
                 if not(flagList1 is None):
                     flagList1 = flagList1.split(",")
                     flagList1 = [flag.replace('\"', '') for flag in flagList1]
+                else:
+                    flagList1=[]
 
                 if not(flagList2 is None):
                     flagList2 = flagList2.split(",")
                     flagList2 = [flag.replace('\"', '') for flag in flagList2]
+                else:
+                   flagList2=[]
 
                 objs[var] = orchestrator.executeTestSuite(testSuite, testBed, flagList1, flagList2)
 
