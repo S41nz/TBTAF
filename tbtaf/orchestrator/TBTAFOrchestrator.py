@@ -165,14 +165,14 @@ class TBTAFOrchestrator(object):
 			tbTestSuite = projectInstance.getTBTestSuite()
 			#vale la pena agregar excepcion si se provee lista de tags y el proyecto tiene un TBTestSuite y no smart?
 			#si el proyecto tiene ligado un TBTestSuite, como puedo usar getTestCases() de TBSmartTestSuite para filtrar por Tag. En caso que siguiente exception no deba levantarse.
-			if tbTestSuite.getTestSuiteType == TBTAFTestSuiteType.NORMAL and len(tagList):
+			if tbTestSuite.getTestSuiteType() == TBTAFTestSuiteType.NORMAL and len(tagList):
 				raise ValueError("Normal TBTestSuite not compatible with Tag list Exception")
 				print 'Error: TBTAFOrchestrator.GetTests'
 			else:
 				#Check what type of Test Suite that project has and action accordingly
 				#Get initial list of test cases. This depends on what type of TBTestSuite we have. 
 				#Al parecer la lista de tags es para filtar que test cases quieres obtener del total del proyecto. 
-				if tbTestSuite.getTestSuiteType == TBTAFTestSuiteType.NORMAL or not len(tagList):
+				if tbTestSuite.getTestSuiteType() == TBTAFTestSuiteType.NORMAL or not len(tagList):
 					queriedTests = tbTestSuite.getTestCases()
 				else:
 					#Do I need to append list each time I get from getTestCases?
