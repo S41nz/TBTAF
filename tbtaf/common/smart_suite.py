@@ -24,6 +24,7 @@ class TBSmartTestSuite(TBTestSuite):
         '''
         self.suiteType = TBTAFTestSuiteType.SMART
         self.suiteID = suiteID
+        self.suiteTestCases = []
     
     
     def getTestCases(self,targetTags,queryFilter=None):
