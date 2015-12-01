@@ -60,9 +60,12 @@ class ExecutionTBTestSuite:
                 self.aborted = False
                 break
             else:
-                test.getResult().setStartTimestamp(datetime.datetime.now())
-                test.execute() #cuando se usaria cleanup? y que hace?
-                test.getResult().setEndTimestamp(datetime.datetime.now())
+                try:
+                    test.getResult().setStartTimestamp(datetime.datetime.now())
+                    test.execute() #cuando se usaria cleanup? y que hace?
+                    test.getResult().setEndTimestamp(datetime.datetime.now())
+                except Exception as e:
+                    print 'Exception found while executing test ' + str(test.getTestMetadata().getAssetID()) + '. The exception thrown was: ' + str(e)
                 self.nextIndexToExecute = self.nextIndexToExecute + 1
         if self.status != TBTAFExecutionStatusType.PAUSED and self.status != TBTAFExecutionStatusType.ABORTED:
             self.status = TBTAFExecutionStatusType.COMPLETED
@@ -93,8 +96,11 @@ class ExecutionTBTestSuite:
         percentage = round(self.nextIndexToExecute * 100.0 / count, 2)
         print 'Executed ' + str(self.nextIndexToExecute) + '/' + str(count) + ' : ' + str(percentage) + '% completed'
         for test in self.tbTestSuite.getTestCases():
-            id = test.getTestMetadata().getAssetID()
-            print str(id) + ': ' + test.getResult().getVerdict()
+            try:
+                id = test.getTestMetadata().getAssetID()
+                print str(id) + ': ' + test.getResult().getVerdict()
+            except:
+                print 'Cannot get result for test: ' + str(id)
         
         self.statusWrapper.setExecutionStatusType(self.getStatus())
         self.statusWrapper.setSuiteResult(self.tbTestSuite.getSuiteResult())
