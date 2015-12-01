@@ -32,7 +32,7 @@ class ExecutionTBTestSuite:
             raise Exception('The suite is already being executed or it is paused')
         
         for test in self.tbTestSuite.getTestCases():    
-            test.cleanup() #Limpia por si se ejecuta la suite por segunda vez
+            test.setup()
     
         self.suiteRunner = Thread(target = self.executionThread,  args=[])
         self.suiteRunner.start()
@@ -62,14 +62,19 @@ class ExecutionTBTestSuite:
             else:
                 try:
                     test.getResult().setStartTimestamp(datetime.datetime.now())
-                    test.execute() #cuando se usaria cleanup? y que hace?
+                    test.execute()
                     test.getResult().setEndTimestamp(datetime.datetime.now())
+                    test.verdict()
                 except Exception as e:
                     print 'Exception found while executing test ' + str(test.getTestMetadata().getAssetID()) + '. The exception thrown was: ' + str(e)
                 self.nextIndexToExecute = self.nextIndexToExecute + 1
         if self.status != TBTAFExecutionStatusType.PAUSED and self.status != TBTAFExecutionStatusType.ABORTED:
             self.status = TBTAFExecutionStatusType.COMPLETED
             #self.tbTestSuite.getSuiteResult().setEndTimestamp(datetime.datetime.now()) #per Muro
+        
+        if self.status == TBTAFExecutionStatusType.COMPLETED or self.status == TBTAFExecutionStatusType.ABORTED:
+            for test in self.tbTestSuite.getTestCases():    
+                test.cleanup()
     
     def abort(self):
         if self.status != TBTAFExecutionStatusType.EXECUTING:
