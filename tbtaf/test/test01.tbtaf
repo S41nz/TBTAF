@@ -1,0 +1,32 @@
+//TBTAF Integration test 01
+//Description:
+//1.-Create a simple test suite
+//2.-Create a test bed
+//3.-Create a TBTAF project to be stored in DB
+//4.-Perform a simple query about the tags contained in the test suite
+
+myTestBed = create_test_bed()
+//After the command above the following output on console is expected:
+//New test bed created on: localhost
+
+//Replace TEST_CONTENT_LOCATION by the actual location on the repo for the test TBTestCases
+myTestSuite = create_test_suite("C:\\Users\\psainza\\Documents\\TBTAF\\TBTAF\\tbtaf\\test\\discoverer\\samples")
+//After the command above the following output on console is expected:
+// For each discovered test
+// Test <Test ID> loaded from: <Complete test filepath>
+// Then at the end:
+// Test suite created with <number of loaded tests> test cases
+
+//Create the test project.
+create_new_project(myTestSuite,myTestBed,"TBTAF Smoke test project 01")
+//After the command above the following output on console is expected:
+//New project created: TBTAF Smoke test project 01
+//Number of tests: <Number of contained tests>
+//Execution nodes: localhost
+
+get_tags("TBTAF Smoke test project 01")
+//I should get listed all the tags contained in the test content of the created test suite
+
+//Replace TEST_TAG by one of the tags contained on the created test suite
+get_tests("TBTAF Smoke test project 01",["TBTAF"],IN)
+//After the command above its expected to display the list of all the test IDs that contained the requested tag above
