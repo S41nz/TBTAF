@@ -47,6 +47,20 @@ class TBTAFPublisher(object):
         #Iterate over test cases and retrieve test metadata
         testCasesList = tBTestSuiteInstance.getTestCases();
         
+        #Define to sort the test cases by priority or by asset id
+        sortPriority = True
+        for testCase in testCasesList:
+            if not str(testCase.getTestMetadata().getPriority()).isdigit():
+                sortPriority = False
+                break
+        
+        if sortPriority:
+            #Sort by priority
+            testCasesList.sort(key=lambda x:x.getTestMetadata().getPriority(), reverse=False)
+        else:
+            #Sort by asset id
+            testCasesList.sort(key=lambda x:x.getTestMetadata().getAssetID(), reverse=False)
+        
         for testCase in testCasesList:
             #Initialize table row tag 
             s_tests = s_tests  + "<tr>"
@@ -122,6 +136,20 @@ class TBTAFPublisher(object):
         testCasesList = tBTestSuiteInstance.getTestCases();
         #Initialize overview HTML string
         s_overview = ""
+        
+        #Define to sort the test cases by priority or by asset id
+        sortPriority = True
+        for testCase in testCasesList:
+            if not str(testCase.getTestMetadata().getPriority()).isdigit():
+                sortPriority = False
+                break
+        
+        if sortPriority:
+            #Sort by priority
+            testCasesList.sort(key=lambda x:x.getTestMetadata().getPriority(), reverse=False)
+        else:
+            #Sort by asset id
+            testCasesList.sort(key=lambda x:x.getTestMetadata().getAssetID(), reverse=False)
 
         #Iterate over test cases and retrieve test metadata
         for testCase in testCasesList:
