@@ -109,7 +109,7 @@ class TBTAFOrchestrator(object):
 					_smartTestSuite = TBSmartTestSuite(testSuiteID)
 					_smartTestSuite.addTestCaseList(testCaseList)
 					
-					filteredTestCases = _testSuite.getTestCases(tagList, TBTAFFilterType.IN)
+					filteredTestCases = _smartTestSuite.getTestCases(tagList, TBTAFFilterType.IN)
 					_smartTestSuite.clearTestCaseList()
 					_smartTestSuite.addTestCaseList(filteredTestCases)
 					
@@ -124,6 +124,7 @@ class TBTAFOrchestrator(object):
 	def publishTestPlan(self, tbTestSuiteInstance, testPlanLocation, outputFormat = 'html'):
 		#_publisher = TBTAFPublisher()
 		TBTAFPublisher().PublishTestPlan(tbTestSuiteInstance, testPlanLocation, outputFormat)
+		print 'Test plan published at: ', testPlanLocation
 
 	#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the result report will be generated.
 	#resultLocation - String specifying the location where the result report wants to be placed.
@@ -131,6 +132,7 @@ class TBTAFOrchestrator(object):
 
 	def publishResultReport(self, tbTestSuiteInstance, resultLocation, outputFormat = 'html'):
 		TBTAFPublisher().PublishResultReport(tbTestSuiteInstance, resultLocation, outputFormat)
+		print 'Test result created at: ', resultLocation
 
 		#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the result report will be generated.
         #tbTestSuiteInstance - Reference of the TBTestSuite representing the set of tests that will be executed.
@@ -139,7 +141,18 @@ class TBTAFOrchestrator(object):
         #executorListenerCollection - Optional collection of ExecutorListener implementations that would want to listen and react to specific events during the execution of that specific TBTestSuite
 	def executeTestSuite(self, tbTestSuiteInstance, testBed = "dummy", flagsCollection = [], executorListenerCollection = []):
 		#tbtafExecutorInstance = TBTAFExecutor()
-		return TBTAFExecutor().executeTests(tbTestSuiteInstance, testBed, flagsCollection, executorListenerCollection)
+		_executor = TBTAFExecutor()
+		suiteResult = _executor.executeTests(tbTestSuiteInstance, testBed, flagsCollection, executorListenerCollection)
+
+		waitingComplete = True
+		while waitingComplete:
+			result = _executor.getStatus(tbTestSuiteInstance)
+			time.sleep(5)
+			waitingComplete = result.getExecutionStatusType() != TBTAFExecutionStatusType.COMPLETED
+		
+		#return suiteResult
+		#Si esto no funciona, el executor tiene que poner un metodo llamado getSuiteResult que devuelva getSuiteResult.
+		return tbTestSuiteInstance.getSuiteResult()
 	
         #projectName - String identifying the Project from where the query is being made.
         #tagList - Optional List of tags in order to filter the query being made.
