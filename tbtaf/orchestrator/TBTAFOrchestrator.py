@@ -111,7 +111,7 @@ class TBTAFOrchestrator(object):
 					_smartTestSuite = TBSmartTestSuite(testSuiteID)
 					_smartTestSuite.addTestCaseList(testCaseList)
 					
-					filteredTestCases = _smartTestSuite.getTestCases(tagList, TBTAFFilterType.IN)
+					filteredTestCases = _smartTestSuite.getTestCasesByTags(tagList, TBTAFFilterType.IN)
 					_smartTestSuite.clearTestCaseList()
 					_smartTestSuite.addTestCaseList(filteredTestCases)
 					
@@ -193,11 +193,11 @@ class TBTAFOrchestrator(object):
 					#Do I need to append list each time I get from getTestCases?
 					#Should we suggest getting a list in getTestCases() for inOutList (list of filterType)
 					if filterType is not None:
-						queriedTests = tbTestSuite.getTestCases(tagList, filterType)
+						queriedTests = tbTestSuite.getTestCasesByTags(tagList, filterType)
 					else:
-						queriedTests = tbTestSuite.getTestCases(tagList) #Asi se pueden omitir parametros opcionales? Y si mejor le pongo el filterType siempre?
+						queriedTests = tbTestSuite.getTestCasesByTags(tagList) #Asi se pueden omitir parametros opcionales? Y si mejor le pongo el filterType siempre?
 				#Duda: En el diccionario, debo tener un tag por cada tag del proyecto, aunque este filtrado por el parametro de tagList? O, si es filtrado, lo saco del diccionario.
-				tagDictionary = self.getTags(projectName)
+				tagDictionary = self.getTags(projectName, 'N')
 				#Create empty dictionary
 				# Empty dict
 				d = {}
@@ -225,7 +225,7 @@ class TBTAFOrchestrator(object):
 		return resultTestCases
 
 	#projectName - String describing the project from which the query is being made.
-	def getTags(self, projectName):
+	def getTags(self, projectName, printFlag = 'Y'):
 		if self.isInvalidArgument(projectName):
 			print 'Error: TBTAFOrchestrator.GetTags'
 		elif not self.isExistingProject(projectName):
@@ -242,7 +242,8 @@ class TBTAFOrchestrator(object):
 					for tag in testTags:
 						if tag not in tagList:
 							tagList.append(tag)
-			print 'Tags: ', ', '.join(tagList)
+			if printFlag == 'Y':
+				print 'Tags: ', ', '.join(tagList)
 			return tagList
 		
 	#Validations

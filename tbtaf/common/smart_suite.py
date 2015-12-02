@@ -27,7 +27,7 @@ class TBSmartTestSuite(TBTestSuite):
         self.suiteTestCases = []
     
     
-    def getTestCases(self,targetTags,queryFilter=None):
+    def getTestCasesByTags(self,targetTags,queryFilter=None):
         '''
         Method to obtain the tests that contain at least one of the given tags on the input list
         '''
