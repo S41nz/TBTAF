@@ -17,6 +17,7 @@ from common.smart_suite import TBSmartTestSuite
 
 from common.enums.suite_type import TBTAFTestSuiteType
 from common.enums.filter_type import TBTAFFilterType
+from common.enums.execution_status_type import TBTAFExecutionStatusType
 
 from interpreter.TBTAFInterpreter import TBTAFInterpreter
 from discoverer.discoverer import TBTAFDiscoverer
