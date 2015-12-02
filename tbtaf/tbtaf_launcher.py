@@ -7,7 +7,7 @@ from orchestrator.TBTAFOrchestrator import TBTAFOrchestrator
 
 if __name__ == '__main__':
     
-    testScript = "C:\\Users\\psainza\\Documents\\TBTAF\\TBTAF\\tbtaf\\test\\test02.tbtaf"
+    testScript = "D:\\tbtaf\\tbtaf\\test\\test03.tbtaf"
     print "Welcome to TBTAF Test bed"
     
     myTBTAF = TBTAFOrchestrator()

@@ -10,7 +10,7 @@ myTestBed = create_test_bed()
 //New test bed created on: localhost
 
 //Replace TEST_CONTENT_LOCATION by the actual location on the repo for the test TBTestCases
-myTestSuite = create_test_suite("C:\\Users\\psainza\\Documents\\TBTAF\\TBTAF\\tbtaf\\test\\discoverer\\samples")
+myTestSuite = create_test_suite("D:\\tbtaf\\test\\smoke")
 //After the command above the following output on console is expected:
 // For each discovered test
 // Test <Test ID> loaded from: <Complete test filepath>
@@ -29,6 +29,6 @@ myResult = execute(myTestSuite,myTestBed)
 //Executing: <Test ID> Progress: [0-100%]
 
 //Replace TEST_RESULT_LOCATION by the actual location on the repo for the test result of the test execution
-publish test_results(myResult,"C:\\Users\\psainza\\Documents\\TBTAF\\TBTAF\\tbtaf\\test\\discoverer\\samples\\SmokeResultReport.html",HTML)
+publish test_results(myTestSuite,"D:\\tbtaf\\tbtaf\\test\\discoverer\\samples\\SmokeResultReport.html",HTML)
 //After the command above the following output on console is expected:
 //Test result created at: TEST_RESULT_LOCATION

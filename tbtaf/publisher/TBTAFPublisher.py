@@ -37,7 +37,7 @@ class TBTAFPublisher(object):
         except IOError:
             print "Invalid filePath"
             raise IllegalArgumentException("IllegalArgumentException in filePath argument in PublishTestPlan")
-        
+              
         #Read HTML Template file and put into a string
         htmlTemplate = open('publisher/test_plan_template.html','r')
         htmlString = htmlTemplate.read()
@@ -87,6 +87,7 @@ class TBTAFPublisher(object):
         reportTime = datetime.datetime.now()
         s_reportTime = reportTime.strftime('%B %d,%Y %H:%M:%S')
         #Replace strings in HTML file
+        htmlString = htmlString.replace('r_suite',str(tBTestSuiteInstance.getSuiteID()))
         htmlString = htmlString.replace('r_report_time',s_reportTime)
         htmlString = htmlString.replace('r_tests',s_tests)
         
@@ -197,6 +198,7 @@ class TBTAFPublisher(object):
         s_reportTime = reportTime.strftime('%B %d,%Y %H:%M:%S')
 
         #Replace the html string with summary results
+        htmlString = htmlString.replace('r_suite',str(tBTestSuiteInstance.getSuiteID()))
         htmlString = htmlString.replace('r_total_tests',str(totalTests))
         htmlString = htmlString.replace('r_passed',str(summaryTestSuite.passTests))
         htmlString = htmlString.replace('r_failed',str(summaryTestSuite.failedTests))
