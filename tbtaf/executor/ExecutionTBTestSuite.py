@@ -93,19 +93,19 @@ class ExecutionTBTestSuite:
         
     def getRunStatus(self):
         c = 0
-        print 'Execution status: ' + self.getStatus()
-        print 'Suite status: ' + self.tbTestSuite.getSuiteResult().getVerdict()
+        #print 'Execution status: ' + self.getStatus()
+        #print 'Suite status: ' + self.tbTestSuite.getSuiteResult().getVerdict()
         count = len(self.tbTestSuite.getTestCases())
         if count < 1:
             raise Exception('The suite does not have test cases')
         percentage = round(self.nextIndexToExecute * 100.0 / count, 2)
         print 'Executed ' + str(self.nextIndexToExecute) + '/' + str(count) + ' : ' + str(percentage) + '% completed'
-        for test in self.tbTestSuite.getTestCases():
+        '''for test in self.tbTestSuite.getTestCases():
             try:
                 id = test.getTestMetadata().getAssetID()
                 print str(id) + ': ' + test.getResult().getVerdict()
             except:
-                print 'Cannot get result for test: ' + str(id)
+                print 'Cannot get result for test: ' + str(id)'''
         
         self.statusWrapper.setExecutionStatusType(self.getStatus())
         self.statusWrapper.setSuiteResult(self.tbTestSuite.getSuiteResult())
