@@ -60,13 +60,13 @@ class ExecutionTBTestSuite:
                 self.aborted = False
                 break
             else:
-                try:
-                    test.getResult().setStartTimestamp(datetime.datetime.now())
+                test.getResult().setStartTimestamp(datetime.datetime.now())
+                try:    
                     test.execute()
-                    test.getResult().setEndTimestamp(datetime.datetime.now())
-                    test.verdict()
                 except Exception as e:
                     print 'Exception found while executing test ' + str(test.getTestMetadata().getAssetID()) + '. The exception thrown was: ' + str(e)
+                test.getResult().setEndTimestamp(datetime.datetime.now())
+                test.verdict()
                 self.nextIndexToExecute = self.nextIndexToExecute + 1
         if self.status != TBTAFExecutionStatusType.PAUSED and self.status != TBTAFExecutionStatusType.ABORTED:
             self.status = TBTAFExecutionStatusType.COMPLETED
