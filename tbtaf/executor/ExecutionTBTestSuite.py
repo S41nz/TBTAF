@@ -60,11 +60,14 @@ class ExecutionTBTestSuite:
                 self.aborted = False
                 break
             else:
-                test.getResult().setStartTimestamp(datetime.datetime.now())
+                # Don't call test.getResult().setStartTimestamp() method here due to some TBTestCase classes 
+                # reset testResult property on their execute() method.
+                startTime = datetime.datetime.now()
                 try:    
                     test.execute()
                 except Exception as e:
                     print 'Exception found while executing test ' + str(test.getTestMetadata().getAssetID()) + '. The exception thrown was: ' + str(e)
+                test.getResult().setStartTimestamp(startTime)
                 test.getResult().setEndTimestamp(datetime.datetime.now())
                 test.verdict()
                 self.nextIndexToExecute = self.nextIndexToExecute + 1
