@@ -3,6 +3,7 @@ Created on 07/11/2015
 
 @author: S41nz
 '''
+from __future__ import absolute_import
 import sys
 from common.suite import TBTestSuite
 from common.result import TBTAFResult
@@ -113,7 +114,7 @@ class TBSmartTestSuite(TBTestSuite):
         # First the verdict
         if len(selectedTestCases) == passTests and len(selectedTestCases) > 0:
             candidateVerdict = TBTAFVerdictType.PASS
-        elif failedTests is not 0:
+        elif failedTests != 0:
             candidateVerdict = TBTAFVerdictType.FAIL
         else:
             candidateVerdict = TBTAFVerdictType.INCONCLUSIVE

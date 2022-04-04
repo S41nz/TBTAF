@@ -2,11 +2,12 @@
 Execution class
 '''
 
+from __future__ import absolute_import
 import datetime
 import time
 from threading import Thread
 from time import sleep
-from ExecutionTBTestSuite import ExecutionTBTestSuite
+from .ExecutionTBTestSuite import ExecutionTBTestSuite
 
 class TBTAFExecutor:
 

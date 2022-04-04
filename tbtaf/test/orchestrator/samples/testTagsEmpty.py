@@ -11,6 +11,8 @@ Created on 06/11/2015
 
 @author: Nander
 '''
+from __future__ import absolute_import
+from __future__ import print_function
 from common.test import TBTestCase
 from common.result import TBTAFResult
 from common.trace import TBTAFTrace
@@ -33,7 +35,7 @@ class DiscovererCompleteAndValidTest(TBTestCase):
 
     def setup(self):
         TBTestCase.setup(self)
-        print "Setup performed from DiscovererCompleteAndValidTest"
+        print("Setup performed from DiscovererCompleteAndValidTest")
         self.testTrace = TBTAFTrace("DiscovererCompleteAndValidTest")
         self.testTrace.addEvent(TBTAFEvent(TBTAFEventType.INFO,"Setup performed from DiscovererCompleteAndValidTest",self.testTrace.getTraceSource()))
         
@@ -41,12 +43,12 @@ class DiscovererCompleteAndValidTest(TBTestCase):
 
     def execute(self):
         TBTestCase.execute(self)
-        print "Execute performed from DiscovererCompleteAndValidTest"
+        print("Execute performed from DiscovererCompleteAndValidTest")
         self.testResult = TBTAFResult(TBTAFVerdictType.PASS,"DiscovererCompleteAndValidTest")
 
 
     def cleanup(self):
         TBTestCase.cleanup(self)
-        print "Cleanup performed from DiscovererCompleteAndValidTest"
+        print("Cleanup performed from DiscovererCompleteAndValidTest")
 
         

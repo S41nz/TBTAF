@@ -3,13 +3,15 @@ Crstr(e)atstr(e)d on 22/11/2015
 @author:
 '''
 
-from exceptions import IOError
-import re
+from __future__ import absolute_import
+from __future__ import print_function
+# from exceptions import IOError
+import regex as re
 import os as _os
 import sys
-from result import Result
-from status import TBTAFParsingScriptStatus
-from parsing_summary import ParsingSummary
+from .result import Result
+from .status import TBTAFParsingScriptStatus
+from .parsing_summary import ParsingSummary
 from common.enums.filter_type import TBTAFFilterType
 import orchestrator.TBTAFOrchestrator
 from common.exception.IllegalArgumentException import IllegalArgumentException
@@ -297,7 +299,7 @@ class TBTAFInterpreter(object):
                 orchestrator.createNewProject(testSuite, testBed, projectName)
 
         except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
-            print self._formatMsg(fileName, lineNumber, "Fatal Error. Execution cannot continue. " + str(e), TBTAFInterpreter.MSG_ERROR)
+            print(self._formatMsg(fileName, lineNumber, "Fatal Error. Execution cannot continue. " + str(e), TBTAFInterpreter.MSG_ERROR))
 
         #ExecuteTests
         try:
@@ -328,7 +330,7 @@ class TBTAFInterpreter(object):
                 objs[var] = orchestrator.executeTestSuite(testSuite, testBed, flagList1, flagList2)
 
         except ValueError as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_ERROR)
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_ERROR))
             return
 
         #PublishTestPlan
@@ -345,7 +347,7 @@ class TBTAFInterpreter(object):
                 orchestrator.publishTestPlan(testSuite, filePath, format)
 
         except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING))
 
         #PublishResultReport
         try:
@@ -360,7 +362,7 @@ class TBTAFInterpreter(object):
                 orchestrator.publishResultReport(testSuite, filePath, format)
 				
         except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING))
 
         #GetTests
         try:
@@ -387,7 +389,7 @@ class TBTAFInterpreter(object):
                     orchestrator.getTests(projectName, tagList, filter)
 
         except ValueError as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING))
 
         #GetTags
         try:
@@ -400,4 +402,4 @@ class TBTAFInterpreter(object):
                 orchestrator.getTags(projectName)
 
         except ValueError as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING))

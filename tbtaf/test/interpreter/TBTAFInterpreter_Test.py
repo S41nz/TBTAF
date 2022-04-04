@@ -3,6 +3,8 @@ Crstr(e)atstr(e)d on 22/11/2015
 @author:
 '''
 
+from __future__ import absolute_import
+from __future__ import print_function
 from exceptions import IOError
 import re
 import os as _os
@@ -18,53 +20,53 @@ from common.exception.NonSupportedFormatException import NonSupportedFormatExcep
 class Orchestrator(object):
     def createNewProject(self, testSuite, testBed, projectName):
         print("\ncreateNewProject: ")
-        print("testSuite: "+testSuite)
-        print("testBed:" +testBed)
-        print("projectName: "+ projectName)
+        print(("testSuite: "+testSuite))
+        print(("testBed:" +testBed))
+        print(("projectName: "+ projectName))
         pass
 
     def createTestBed(self, urlList = ['http://localhost']):
         print("\ncreateTestBed:")
-        print("urlList:" + str(urlList))
+        print(("urlList:" + str(urlList)))
         return "bed1"
 
     def createTestSuite(self, filePath, tagList = None):
         print("\ncreateTestSuite:")
-        print("filePath: "+filePath)
-        print("tagList: "+str(tagList))
+        print(("filePath: "+filePath))
+        print(("tagList: "+str(tagList)))
         return "testSuite1"
 
     def PublishTestPlan(self, testSuite, filePath, formatFlag):
         print("\nPublishTestPlan:")
-        print("testSuite: "+testSuite)
-        print("filePath: "+filePath)
-        print("formatFlag: "+formatFlag)
+        print(("testSuite: "+testSuite))
+        print(("filePath: "+filePath))
+        print(("formatFlag: "+formatFlag))
 
     def PublishResultReport(self, testSuite, filePath, formatFlag):
         print("\nPublishResultReport:")
-        print("testSuite: "+testSuite)
-        print("filePath: "+filePath)
-        print("formatFlag: "+formatFlag)
+        print(("testSuite: "+testSuite))
+        print(("filePath: "+filePath))
+        print(("formatFlag: "+formatFlag))
         pass
 
     def executeTests(self, tbTestSuite, testBed='dummy', testSuiteFlags=[], executorListener=[]):
         print("\nexecuteTests:")
-        print("testSuite: "+tbTestSuite)
-        print("testBed:" +testBed)
-        print("testSuiteFlags: "+str(testSuiteFlags))
-        print("executorListener: "+str(executorListener))
+        print(("testSuite: "+tbTestSuite))
+        print(("testBed:" +testBed))
+        print(("testSuiteFlags: "+str(testSuiteFlags)))
+        print(("executorListener: "+str(executorListener)))
         pass
 
     def getTests(self, projectName, tagList = [], filterType = None):
         print("\ngetTests:")
-        print("projectName: "+ projectName)
-        print("tagList: "+str(tagList))
-        print("filterType: "+str(filterType))
+        print(("projectName: "+ projectName))
+        print(("tagList: "+str(tagList)))
+        print(("filterType: "+str(filterType)))
         pass
 
     def getTags(self, projectName):
         print("\ngetTags:")
-        print("projectName: "+ projectName)
+        print(("projectName: "+ projectName))
         pass
 
 class TBTAFInterpreter(object):
@@ -349,7 +351,7 @@ class TBTAFInterpreter(object):
                 orchestrator.createNewProject(testSuite, testBed, projectName)
 
         except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
-            print self._formatMsg(fileName, lineNumber, "Fatal Error. Execution cannot continue. " + str(e), TBTAFInterpreter.MSG_ERROR)
+            print(self._formatMsg(fileName, lineNumber, "Fatal Error. Execution cannot continue. " + str(e), TBTAFInterpreter.MSG_ERROR))
 
         #ExecuteTests
         try:
@@ -380,7 +382,7 @@ class TBTAFInterpreter(object):
                 objs[var] = orchestrator.executeTestSuite(testSuite, testBed, flagList1, flagList2)
 
         except ValueError as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_ERROR)
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_ERROR))
             return
 
         #PublishTestPlan
@@ -397,7 +399,7 @@ class TBTAFInterpreter(object):
                 orchestrator.publishTestPlan(testSuite, filePath, format)
 
         except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING))
 
         #PublishResultReport
         try:
@@ -412,7 +414,7 @@ class TBTAFInterpreter(object):
                 orchestrator.publishResultReport(testSuite, filePath, format)
 				
         except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING))
 
         #GetTests
         try:
@@ -439,7 +441,7 @@ class TBTAFInterpreter(object):
                     orchestrator.getTests(projectName, tagList, filter)
 
         except ValueError as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING))
 
         #GetTags
         try:
@@ -452,7 +454,7 @@ class TBTAFInterpreter(object):
                 orchestrator.getTags(projectName)
 
         except ValueError as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING))
 
 def main():
     o = Orchestrator()

@@ -4,6 +4,7 @@ Created on 11/11/2015
 @author: S41nz
 '''
 
+from __future__ import absolute_import
 from common.enums.node_status import TBTAFNodeStatus
 
 class TBTestNode(object):

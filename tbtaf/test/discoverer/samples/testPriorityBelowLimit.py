@@ -6,11 +6,13 @@
 <Description>Priority above limit.</Description>
 </TBTAF>
 '''
-'''
-Created on 06/11/2015
+# '''
+# Created on 06/11/2015
 
-@author: Nander
-'''
+# @author: Nander
+# '''
+from __future__ import absolute_import
+from __future__ import print_function
 from common.test import TBTestCase
 from common.result import TBTAFResult
 from common.trace import TBTAFTrace
@@ -34,7 +36,7 @@ class TestPriorityBelowLimit(TBTestCase):
 
     def setup(self):
         TBTestCase.setup(self)
-        print "Setup performed from " + self.testName
+        print("Setup performed from " + self.testName)
         self.testTrace = TBTAFTrace(self.testName)
         setup_str = "Setup performed from " + self.testName
         self.testTrace.addEvent(TBTAFEvent(TBTAFEventType.INFO,
@@ -43,11 +45,11 @@ class TestPriorityBelowLimit(TBTestCase):
 
     def execute(self):
         TBTestCase.execute(self)
-        print "Execute performed from " + self.testName
+        print("Execute performed from " + self.testName)
         self.testResult = TBTAFResult(TBTAFVerdictType.PASS,
                                       self.testName)
 
     def cleanup(self):
         TBTestCase.cleanup(self)
-        print "Cleanup performed from " + self.testName
+        print("Cleanup performed from " + self.testName)
         

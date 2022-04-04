@@ -3,6 +3,7 @@ Created on 25/11/2015
 
 @author: pvicenci
 '''
+from __future__ import absolute_import
 import unittest
 
 from discoverer.discoverer import TBTAFDiscoverer

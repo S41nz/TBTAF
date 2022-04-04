@@ -3,6 +3,7 @@ Created on 11/11/2015
 
 @author: S41nz
 '''
+from __future__ import absolute_import
 from common.node import TBTestNode
 
 class TBTestBed(object):

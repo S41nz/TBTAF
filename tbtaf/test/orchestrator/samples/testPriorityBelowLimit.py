@@ -11,6 +11,8 @@ Created on 06/11/2015
 
 @author: Nander
 '''
+from __future__ import absolute_import
+from __future__ import print_function
 from common.test import TBTestCase
 from common.result import TBTAFResult
 from common.trace import TBTAFTrace
@@ -33,7 +35,7 @@ class DiscovererOnlyTheRequiredTest(TBTestCase):
 
     def setup(self):
         TBTestCase.setup(self)
-        print "Setup performed from DiscovererOnlyTheRequiredTest"
+        print("Setup performed from DiscovererOnlyTheRequiredTest")
         self.testTrace = TBTAFTrace("DiscovererOnlyTheRequiredTest")
         self.testTrace.addEvent(TBTAFEvent(TBTAFEventType.INFO,"Setup performed from DiscovererOnlyTheRequiredTest",self.testTrace.getTraceSource()))
         
@@ -41,12 +43,12 @@ class DiscovererOnlyTheRequiredTest(TBTestCase):
 
     def execute(self):
         TBTestCase.execute(self)
-        print "Execute performed from DiscovererOnlyTheRequiredTest"
+        print("Execute performed from DiscovererOnlyTheRequiredTest")
         self.testResult = TBTAFResult(TBTAFVerdictType.PASS,"DiscovererOnlyTheRequiredTest")
 
 
     def cleanup(self):
         TBTestCase.cleanup(self)
-        print "Cleanup performed from DiscovererOnlyTheRequiredTest"
+        print("Cleanup performed from DiscovererOnlyTheRequiredTest")
 
         

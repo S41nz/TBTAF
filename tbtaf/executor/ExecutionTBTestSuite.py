@@ -1,4 +1,6 @@
-from TBTAFExecutionStatus import TBTAFExecutionStatus
+from __future__ import absolute_import
+from __future__ import print_function
+from .TBTAFExecutionStatus import TBTAFExecutionStatus
 from common.enums.execution_status_type import TBTAFExecutionStatusType
 from threading import Thread
 import time
@@ -66,7 +68,7 @@ class ExecutionTBTestSuite:
                 try:    
                     test.execute()
                 except Exception as e:
-                    print 'Exception found while executing test ' + str(test.getTestMetadata().getAssetID()) + '. The exception thrown was: ' + str(e)
+                    print('Exception found while executing test ' + str(test.getTestMetadata().getAssetID()) + '. The exception thrown was: ' + str(e))
                 test.getResult().setStartTimestamp(startTime)
                 test.getResult().setEndTimestamp(datetime.datetime.now())
                 test.verdict()
@@ -102,7 +104,7 @@ class ExecutionTBTestSuite:
         if count < 1:
             raise Exception('The suite does not have test cases')
         percentage = round(self.nextIndexToExecute * 100.0 / count, 2)
-        print 'Executed ' + str(self.nextIndexToExecute) + '/' + str(count) + ' : ' + str(percentage) + '% completed'
+        print('Executed ' + str(self.nextIndexToExecute) + '/' + str(count) + ' : ' + str(percentage) + '% completed')
         '''for test in self.tbTestSuite.getTestCases():
             try:
                 id = test.getTestMetadata().getAssetID()

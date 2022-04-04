@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 from common.sample_test import TBTAFSampleTest
 from common.metadata import TBMetadata
 from common.suite import TBTestSuite
@@ -24,9 +26,9 @@ def validTestPlan():
         publisher_common.addTestCase(testSuite,testCase2)
         publisher = publisher_common.createPublisher()
         publisher.PublishTestPlan(testSuite, "test_plan.html", "html")
-        print "Valid Test Plan : PASSED"
+        print("Valid Test Plan : PASSED")
     except Exception as e:
-        print "Valid Test Plan exception not expected but thrown: " + str(e) + " : FAILED"
+        print("Valid Test Plan exception not expected but thrown: " + str(e) + " : FAILED")
 
 def validResultReport():
     try:
@@ -39,9 +41,9 @@ def validResultReport():
         publisher_common.addTestCase(testSuite,testCase2)
         publisher = publisher_common.createPublisher()
         publisher.PublishResultReport(testSuite, "result_report.html", "html")
-        print "Valid Result Report : PASSED"
+        print("Valid Result Report : PASSED")
     except Exception as e:
-        print "Valid Result Report exception not expected but thrown: " + str(e) + " : FAILED"
+        print("Valid Result Report exception not expected but thrown: " + str(e) + " : FAILED")
         
 def invalidFormatFlagTestPlan():
     try:
@@ -54,9 +56,9 @@ def invalidFormatFlagTestPlan():
         publisher_common.addTestCase(testSuite,testCase2)
         publisher = publisher_common.createPublisher()
         publisher.PublishTestPlan(testSuite, "test_plan.pdf", "pdf")
-        print "Invalid Format Flag Test Plan exception expected but not thrown : FAILED"
+        print("Invalid Format Flag Test Plan exception expected but not thrown : FAILED")
     except NonSupportedFormatException as e:
-        print "Invalid Format Flag Test Plan : PASSED"
+        print("Invalid Format Flag Test Plan : PASSED")
         
 def invalidFileExtensionTestPlan():
     try:
@@ -69,9 +71,9 @@ def invalidFileExtensionTestPlan():
         publisher_common.addTestCase(testSuite,testCase2)
         publisher = publisher_common.createPublisher()
         publisher.PublishTestPlan(testSuite, "test_plan.pdf", "html")
-        print "Invalid File Extension Test Plan exception expected but not thrown : FAILED"
+        print("Invalid File Extension Test Plan exception expected but not thrown : FAILED")
     except NonSupportedFormatException as e:
-        print "Invalid File Extension Test Plan : PASSED"
+        print("Invalid File Extension Test Plan : PASSED")
 
 def invalidFilePathTestPlan():
     try:
@@ -84,9 +86,9 @@ def invalidFilePathTestPlan():
         publisher_common.addTestCase(testSuite,testCase2)
         publisher = publisher_common.createPublisher()
         publisher.PublishTestPlan(testSuite, "../invalid/test_plan.html", "html")
-        print "Invalid File Path Test Plan exception expected but not thrown : FAILED"
+        print("Invalid File Path Test Plan exception expected but not thrown : FAILED")
     except IllegalArgumentException as e:
-        print "Invalid File Path Test Plan : PASSED"
+        print("Invalid File Path Test Plan : PASSED")
         
 def invalidFormatFlagResultReport():
     try:
@@ -99,9 +101,9 @@ def invalidFormatFlagResultReport():
         publisher_common.addTestCase(testSuite,testCase2)
         publisher = publisher_common.createPublisher()
         publisher.PublishResultReport(testSuite, "test_report.pdf", "pdf")
-        print "Invalid Format Flag Test Plan exception expected but not thrown : FAILED"
+        print("Invalid Format Flag Test Plan exception expected but not thrown : FAILED")
     except NonSupportedFormatException as e:
-        print "Invalid Format Flag Test Plan : PASSED"
+        print("Invalid Format Flag Test Plan : PASSED")
         
 def invalidFileExtensionResultReport():
     try:
@@ -114,9 +116,9 @@ def invalidFileExtensionResultReport():
         publisher_common.addTestCase(testSuite,testCase2)
         publisher = publisher_common.createPublisher()
         publisher.PublishResultReport(testSuite, "test_report.pdf", "html")
-        print "Invalid File Extension Test Plan exception expected but not thrown : FAILED"
+        print("Invalid File Extension Test Plan exception expected but not thrown : FAILED")
     except NonSupportedFormatException as e:
-        print "Invalid File Extension Test Plan : PASSED"
+        print("Invalid File Extension Test Plan : PASSED")
 
 def invalidFilePathResultReport():
     try:
@@ -129,9 +131,9 @@ def invalidFilePathResultReport():
         publisher_common.addTestCase(testSuite,testCase2)
         publisher = publisher_common.createPublisher()
         publisher.PublishResultReport(testSuite, "../invalid/test_report.html", "html")
-        print "Invalid File Path Test Plan exception expected but not thrown : FAILED"
+        print("Invalid File Path Test Plan exception expected but not thrown : FAILED")
     except IllegalArgumentException as e:
-        print "Invalid File Path Test Plan : PASSED"
+        print("Invalid File Path Test Plan : PASSED")
 
 validTestPlan()
 validResultReport()

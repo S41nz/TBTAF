@@ -3,6 +3,7 @@ Created on 07/11/2015
 
 @author: 
 '''
+from __future__ import absolute_import
 from common.suite import TBTestSuite
 from common.test_bed import TBTestBed
 

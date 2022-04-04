@@ -3,6 +3,8 @@ Created on 07/11/2015
 
 @author: @andresmuro , @andres.alvarado , @mestradago , @rnunezc
 '''
+from __future__ import absolute_import
+from __future__ import print_function
 import datetime
 import os
 from common.exception.IllegalArgumentException import IllegalArgumentException
@@ -25,17 +27,17 @@ class TBTAFPublisher(object):
         '''
 
         if formatFlag.lower()  != "html":
-            print "Format " + formatFlag + " is not supported"
+            print("Format " + formatFlag + " is not supported")
             raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
         
         if not filePath.lower().endswith(".html"):
-            print "The file path doesn't contain a valid html file"
+            print("The file path doesn't contain a valid html file")
             raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
 
         try:
             htmlFile = open(filePath,'w+')
         except IOError:
-            print "Invalid filePath"
+            print("Invalid filePath")
             raise IllegalArgumentException("IllegalArgumentException in filePath argument in PublishTestPlan")
               
         #Read HTML Template file and put into a string
@@ -101,18 +103,18 @@ class TBTAFPublisher(object):
         '''
 
         if formatFlag.lower()  != "html":
-            print "Format " + formatFlag + " is not supported"
+            print("Format " + formatFlag + " is not supported")
             raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
         
         if not filePath.lower().endswith(".html"):
-            print "The file path doesn't contain a valid html file"
+            print("The file path doesn't contain a valid html file")
             raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
 
 
         try:
             htmlFile = open(filePath,'w+')
         except IOError:
-            print "Invalid filePath"
+            print("Invalid filePath")
             raise IllegalArgumentException("IllegalArgumentException in filePath argument in PublishTestPlan")
         
         #Read HTML Template file and put into a string

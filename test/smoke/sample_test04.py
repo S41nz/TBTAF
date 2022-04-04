@@ -6,6 +6,8 @@
 <Description>Hello from Sample test 1004</Description>
 </TBTAF>
 '''
+from __future__ import absolute_import
+from __future__ import print_function
 from common.test import TBTestCase
 from common.result import TBTAFResult
 from common.trace import TBTAFTrace
@@ -33,7 +35,7 @@ class TBTAFSampleTest(TBTestCase):
         
     def setup(self):
         TBTestCase.setup(self)
-        print "Setup performed from TBTAFSampleTest"
+        print("Setup performed from TBTAFSampleTest")
         self.testTrace = TBTAFTrace("TBTAFSampleTest")
         self.testTrace.addEvent(TBTAFEvent(TBTAFEventType.INFO,"Setup performed from TBTAFSampleTest",self.testTrace.getTraceSource()))
         
@@ -42,12 +44,12 @@ class TBTAFSampleTest(TBTestCase):
     def execute(self):
         time.sleep(7)
         TBTestCase.execute(self)
-        print "Execute performed from TBTAFSampleTest"
+        print("Execute performed from TBTAFSampleTest")
         self.testResult = TBTAFResult(TBTAFVerdictType.PASS,"TBTAFSampleTest")
 
 
     def cleanup(self):
         TBTestCase.cleanup(self)
-        print "Cleanup performed from TBTAFSampleTest"
+        print("Cleanup performed from TBTAFSampleTest")
 
         

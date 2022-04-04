@@ -2,6 +2,7 @@
 Created on 06/11/2015
 '''
 
+from __future__ import absolute_import
 import glob
 import importlib
 import inspect
