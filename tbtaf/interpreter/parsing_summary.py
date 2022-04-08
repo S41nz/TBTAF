@@ -8,4 +8,6 @@ class ParsingSummary(object):
 		self.publishTestResults = []
 		self.getTest = []
 		self.getTags = []
+		self.storeTestResults = []
+		self.getTestResults = []		
 		

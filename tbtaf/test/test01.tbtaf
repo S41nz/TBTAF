@@ -10,7 +10,7 @@ myTestBed = create_test_bed()
 //New test bed created on: localhost
 
 //Replace TEST_CONTENT_LOCATION by the actual location on the repo for the test TBTestCases
-myTestSuite = create_test_suite("C:\\Users\\psainza\\Documents\\TBTAF\\TBTAF\\tbtaf\\test\\discoverer\\samples")
+myTestSuite = create_test_suite("./test/discoverer/samples")
 //After the command above the following output on console is expected:
 // For each discovered test
 // Test <Test ID> loaded from: <Complete test filepath>
