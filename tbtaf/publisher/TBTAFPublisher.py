@@ -9,7 +9,6 @@ import datetime
 import os
 from common.exception.IllegalArgumentException import IllegalArgumentException
 from common.exception.NonSupportedFormatException import NonSupportedFormatException
-#class TBTAFPublisher():
 class TBTAFPublisher(object):
     '''
     The TBTAF Publisher is in charge of generating all the test 

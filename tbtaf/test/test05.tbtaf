@@ -1,0 +1,1 @@
+get test_results(5,"./holis.html",HTML)

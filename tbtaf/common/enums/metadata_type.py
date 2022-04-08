@@ -14,5 +14,7 @@ class TBTAFMetadataType(object):
     TEST_CODE="Test Code"
     #The verdict for a failed test
     PRODUCT_CODE="Product Code"
+    #Metadata to be printed
+    PRINTABLE_CODE="Printable"
 
 

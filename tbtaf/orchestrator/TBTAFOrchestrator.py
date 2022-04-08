@@ -11,6 +11,7 @@ import os
 import six.moves.urllib.parse
 import subprocess
 import time
+import platform
 
 from common.test_bed import TBTestBed
 from common.project import TBProject
@@ -26,6 +27,7 @@ from interpreter.TBTAFInterpreter import TBTAFInterpreter
 from discoverer.discoverer import TBTAFDiscoverer
 from publisher.TBTAFPublisher import TBTAFPublisher
 from executor.Executor import TBTAFExecutor
+from databridge.TBTAFDataBridge import TBTAFDataBridge
 
 class TBTAFOrchestrator(object):
 	
@@ -136,6 +138,21 @@ class TBTAFOrchestrator(object):
 
 	def publishResultReport(self, tbTestSuiteInstance, resultLocation, outputFormat = 'html'):
 		TBTAFPublisher().PublishResultReport(tbTestSuiteInstance, resultLocation, outputFormat)
+		print('Test result created at: ', resultLocation)
+
+	#tbTestSuiteInstance - Reference to a given TBTestSuite instance which will be inserted
+
+	def storeResultReport(self, tbTestSuiteInstance):
+		id = TBTAFDataBridge().storeResult(tbTestSuiteInstance)
+		print('Testsuite result stored with id: ', id)
+
+
+	#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the result report will be generated.
+	#resultLocation - String specifying the location where the result report wants to be placed.
+	#outputFormat - Enumeration flag specifying the output format of the created result report.
+
+	def getResultReport(self, suiteId, resultLocation, outputFormat = 'html'):
+		TBTAFDataBridge().getTestResultBySuiteId(suiteId, resultLocation, outputFormat)
 		print('Test result created at: ', resultLocation)
 
 		#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the result report will be generated.
@@ -289,7 +306,13 @@ class TBTAFOrchestrator(object):
 
 	def validateUrl(self, url):
 		DEVNULL = open(os.devnull, 'w')
-		response = subprocess.call("ping -n 1 " + url, stdout = DEVNULL, stderr = DEVNULL)
+		os_name = platform.system()
+		base_command = ''
+		if os_name == 'Darwin':
+			base_command = 'ping -c 1 '
+		else :
+			base_command = 'ping -n 1 '
+		response = subprocess.call(base_command + url, stdout = DEVNULL, stderr = DEVNULL, shell=True)
 		valid = response == 0
 		if not valid:
 			print('Invalid URL:', url)
