@@ -7,6 +7,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 import datetime
 import os
+from xhtml2pdf import pisa
 from common.exception.IllegalArgumentException import IllegalArgumentException
 from common.exception.NonSupportedFormatException import NonSupportedFormatException
 class TBTAFPublisher(object):
@@ -14,6 +15,9 @@ class TBTAFPublisher(object):
     The TBTAF Publisher is in charge of generating all the test 
     execution related documentation.
     '''
+
+    FORMATS_SUPPORTED = ["html", "pdf"]
+    FILE_EXTENSIONS_SUPPORTED = [".html", ".pdf"]
 
     def __init__(self):
         #Constructor
@@ -25,16 +29,18 @@ class TBTAFPublisher(object):
         based on the discovered metadata
         '''
 
-        if formatFlag.lower()  != "html":
+        if formatFlag.lower() not in TBTAFPublisher.FORMATS_SUPPORTED:
             print("Format " + formatFlag + " is not supported")
             raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
         
-        if not filePath.lower().endswith(".html"):
-            print("The file path doesn't contain a valid html file")
+        fileExtension = os.path.splitext(filePath.lower())[1]
+        if fileExtension not in TBTAFPublisher.FILE_EXTENSIONS_SUPPORTED :
+            print("The file path doesn't contain a valid " + formatFlag.lower() + " file")
             raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
 
         try:
-            htmlFile = open(filePath,'w+')
+            mode = 'w+' if formatFlag.lower() == "html" else 'w+b'
+            htmlFile = open(filePath, mode)
         except IOError:
             print("Invalid filePath")
             raise IllegalArgumentException("IllegalArgumentException in filePath argument in PublishTestPlan")
@@ -42,6 +48,7 @@ class TBTAFPublisher(object):
         #Read HTML Template file and put into a string
         htmlTemplate = open('publisher/test_plan_template.html','r')
         htmlString = htmlTemplate.read()
+        htmlTemplate.close()
         #Initialize tests HTML string
         s_tests = ""
         
@@ -92,7 +99,12 @@ class TBTAFPublisher(object):
         htmlString = htmlString.replace('r_report_time',s_reportTime)
         htmlString = htmlString.replace('r_tests',s_tests)
         
-        htmlFile.write(htmlString)
+        if formatFlag.lower() == "html":
+            htmlFile.write(htmlString)
+        else:
+            headTagIndex = htmlString.index("</head>")
+            htmlString = htmlString[:headTagIndex] + "<style> @page {size: a4 landscape;margin: 2cm;} .table th {text-align: left;} </style>" + htmlString[headTagIndex:]
+            pisa.CreatePDF(htmlString, dest=htmlFile)
         htmlFile.close()
 
     def PublishResultReport(self, tBTestSuiteInstance, filePath, formatFlag):
@@ -101,17 +113,19 @@ class TBTAFPublisher(object):
         based on the execution result of a given test suite
         '''
 
-        if formatFlag.lower()  != "html":
+        if formatFlag.lower() not in TBTAFPublisher.FORMATS_SUPPORTED:
             print("Format " + formatFlag + " is not supported")
             raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
         
-        if not filePath.lower().endswith(".html"):
-            print("The file path doesn't contain a valid html file")
+        fileExtension = os.path.splitext(filePath.lower())[1]
+        if fileExtension not in TBTAFPublisher.FILE_EXTENSIONS_SUPPORTED :
+            print("The file path doesn't contain a valid " + formatFlag.lower() + " file")
             raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
 
 
         try:
-            htmlFile = open(filePath,'w+')
+            mode = 'w+' if formatFlag.lower() == "html" else 'w+b'
+            htmlFile = open(filePath, mode)
         except IOError:
             print("Invalid filePath")
             raise IllegalArgumentException("IllegalArgumentException in filePath argument in PublishTestPlan")
@@ -119,6 +133,7 @@ class TBTAFPublisher(object):
         #Read HTML Template file and put into a string
         htmlTemplate = open('publisher/results_template.html','r')
         htmlString = htmlTemplate.read()
+        htmlTemplate.close()
         #Get summary result from the test suite instance
         summaryTestSuite = tBTestSuiteInstance.getSuiteResult()
         #Calculate total number of test cases
@@ -211,5 +226,10 @@ class TBTAFPublisher(object):
         htmlString = htmlString.replace('r_overview',s_overview)
         htmlString = htmlString.replace('r_report_time',s_reportTime)
         
-        htmlFile.write(htmlString)
+        if formatFlag.lower() == "html":
+            htmlFile.write(htmlString)
+        else:
+            headTagIndex = htmlString.index("</head>")
+            htmlString = htmlString[:headTagIndex] + "<style> @page {size: a4 landscape;margin: 2cm;} .table th {text-align: left;} </style>" + htmlString[headTagIndex:]
+            pisa.CreatePDF(htmlString, dest=htmlFile)
         htmlFile.close()
