@@ -30,7 +30,7 @@ class TBTAFDataBridge(object):
         totalTests = len(tBTestSuiteInstance.suiteTestCases)
         #Calculate success rate of test summary results 
         successRate = (float(summaryTestSuite.passTests) / float(totalTests))*100
-
+        # Construct the argument dictionary
         testSuiteSqlParams = {
             "suite_type" : str(tBTestSuiteInstance.getTestSuiteType()),
             "suite_id" : str(tBTestSuiteInstance.getSuiteID()),

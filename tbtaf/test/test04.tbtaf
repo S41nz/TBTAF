@@ -3,8 +3,7 @@
 //1.-Create a simple test suite
 //2.-Create a test bed
 //3.-Create a TBTAF project to be stored in DB
-//4.-Perform a simple query about the tags contained in the test suite
-
+//4.-Store the TestSuite result into the oracle DB
 myTestBed = create_test_bed()
 //After the command above the following output on console is expected:
 //New test bed created on: localhost
