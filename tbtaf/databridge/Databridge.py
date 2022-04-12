@@ -1,5 +1,4 @@
 from __future__ import absolute_import
-import cx_Oracle
 import os
 from common.suite import TBTestSuite
 from common.metadata import TBMetadata
