@@ -27,13 +27,16 @@ from interpreter.TBTAFInterpreter import TBTAFInterpreter
 from discoverer.discoverer import TBTAFDiscoverer
 from publisher.TBTAFPublisher import TBTAFPublisher
 from executor.Executor import TBTAFExecutor
-from databridge.TBTAFDataBridge import TBTAFDataBridge
+from databridge.TBTAFDatabridge import TBTAFDatabridge
+from databridge.TBTAFOracleDatabridge import TBTAFOracleDatabridge
 
 class TBTAFOrchestrator(object):
 	
 	INVALID_ARGUMENT_EXCEPTION_TEXT = 'Invalid Argument Exception'
 	
 	def __init__(self, nameInitizalizationFile = None):
+		_databridge = TBTAFDatabridge(TBTAFOracleDatabridge())
+		_databridge.connect()
 		if nameInitizalizationFile is None:
 			self.projectList = []
 		else:
@@ -143,7 +146,7 @@ class TBTAFOrchestrator(object):
 	#tbTestSuiteInstance - Reference to a given TBTestSuite instance which will be inserted
 
 	def storeResultReport(self, tbTestSuiteInstance):
-		id = TBTAFDataBridge().storeResult(tbTestSuiteInstance)
+		id = self._databridge.storeResult(tbTestSuiteInstance)
 		print('Testsuite result stored with id: ', id)
 
 
@@ -152,8 +155,9 @@ class TBTAFOrchestrator(object):
 	#outputFormat - Enumeration flag specifying the output format of the created result report.
 
 	def getResultReport(self, suiteId, resultLocation, outputFormat = 'html'):
-		TBTAFDataBridge().getTestResultBySuiteId(suiteId, resultLocation, outputFormat)
+		TBTAFPublisher().PublishResultReport(self._databridge.getTestResultBySuiteId(suiteId), resultLocation, outputFormat)
 		print('Test result created at: ', resultLocation)
+		
 
 		#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the result report will be generated.
         #tbTestSuiteInstance - Reference of the TBTestSuite representing the set of tests that will be executed.
