@@ -1,19 +1,21 @@
 from __future__ import absolute_import
 import os
+from tokenize import String
 from common.suite import TBTestSuite
 from common.metadata import TBMetadata
 from common.result import TBTAFResult
 from common.printable_test import TBTAFPrintableTest
 from publisher.TBTAFPublisher import TBTAFPublisher
 from common.enums.metadata_type import TBTAFMetadataType
-from abc import ABCMeta, abstractmethod
 
 from databridge.Databridge import Databridge
+from databridge.TBTAFOracleDatabridge import TBTAFOracleDatabridge
 
 class TBTAFDatabridge(Databridge):
 
-    def __init__(self, databridgeImp: Databridge) -> None:
-        self._databridgeImp = databridgeImp
+    def __init__(self, databridgeType: String) -> None:
+        if(databridgeType == 'TBTAFOracleDatabridge'):
+            self._databridgeImp = TBTAFOracleDatabridge()
 
     def connect(self):
         return self._databridgeImp.connect()

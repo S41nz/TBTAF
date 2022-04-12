@@ -5,12 +5,11 @@ from common.suite import TBTestSuite
 from common.metadata import TBMetadata
 from common.result import TBTAFResult
 from common.printable_test import TBTAFPrintableTest
-from publisher.TBTAFPublisher import TBTAFPublisher
 from common.enums.metadata_type import TBTAFMetadataType
-from databridge.TBTAFDatabridge import TBTAFDatabridge
+from databridge.Databridge import Databridge
 
 
-class TBTAFOracleDatabridge(TBTAFDatabridge):
+class TBTAFOracleDatabridge(Databridge):
 
     connection = None
     

@@ -35,7 +35,7 @@ class TBTAFOrchestrator(object):
 	INVALID_ARGUMENT_EXCEPTION_TEXT = 'Invalid Argument Exception'
 	
 	def __init__(self, nameInitizalizationFile = None):
-		_databridge = TBTAFDatabridge(TBTAFOracleDatabridge())
+		_databridge = TBTAFDatabridge('TBTAFOracleDatabridge')
 		_databridge.connect()
 		if nameInitizalizationFile is None:
 			self.projectList = []
