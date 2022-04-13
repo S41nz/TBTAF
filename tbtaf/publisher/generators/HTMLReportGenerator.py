@@ -28,7 +28,7 @@ class HTMLReportGenerator(TBTAFReportGenerator):
         try:
             htmlFile = open(filePath, 'w+')
         except IOError:
-            print("Invalid filePath")
+            print("Invalid file path")
             raise IllegalArgumentException("IllegalArgumentException in filePath argument in PublishTestPlan")
               
         #Read HTML Template file and put into a string
@@ -102,7 +102,7 @@ class HTMLReportGenerator(TBTAFReportGenerator):
         try:
             htmlFile = open(filePath, 'w+')
         except IOError:
-            print("Invalid filePath")
+            print("Invalid file path")
             raise IllegalArgumentException("IllegalArgumentException in filePath argument in PublishTestPlan")
         
         #Read HTML Template file and put into a string
