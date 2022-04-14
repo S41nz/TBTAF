@@ -18,8 +18,11 @@ class TBTAFDatabridge(Databridge):
             self._databridgeImp = TBTAFOracleDatabridge()
 
     def connect(self):
-        return self._databridgeImp.connect()
-
+        try:
+            return self._databridgeImp.connect()
+        except Exception:
+            raise 
+        
     def getConnection(self):
         return self._databridgeImp.getConnection
 

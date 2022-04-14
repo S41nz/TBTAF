@@ -21,8 +21,10 @@ class TBTAFOracleDatabridge(Databridge):
         return self.connection
     
     def connect(self):
-        self.connection = cx_Oracle.connect(os.environ['ODB_USER'], os.environ['ODB_PASS'], os.environ['ODB_TNS'])
-        return super().connect()
+        try:
+            self.connection = cx_Oracle.connect(os.environ['ODB_USER'], os.environ['ODB_PASS'], os.environ['ODB_TNS'])
+        except Exception :
+            raise 
 
     def storeResult(self, tBTestSuiteInstance):
         '''
@@ -86,7 +88,7 @@ class TBTAFOracleDatabridge(Databridge):
         cursor.close()
         return newest_id[0]
 
-    def getTestResultBySuiteId(self, suiteId, path, format):
+    def getTestResult(self, suiteId):
         '''
         Get a test execution report into the database
         based on the execution result of a given test suite
@@ -97,6 +99,7 @@ class TBTAFOracleDatabridge(Databridge):
         cursor.rowfactory = lambda *args: dict(zip(columns, args))
         testSiutes = cursor.fetchall()
         for row in testSiutes:
+            print(row)
             testSuite = TBTestSuite(row['SUITE_TYPE'],row['SUITE_ID'])
             cursor.execute(TBTAFOracleDatabridge.testSelectSql, suite_id=int(suiteId))
             columns = [col[0] for col in cursor.description]
