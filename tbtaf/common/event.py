@@ -4,6 +4,7 @@ Created on 02/11/2015
 @author: S41nz
 '''
 
+from __future__ import absolute_import
 import time
 
 class TBTAFEvent(object):

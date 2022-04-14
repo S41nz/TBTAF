@@ -4,11 +4,14 @@ Created on 02/11/2015
 @author: 
 '''
 
-import httplib
+from __future__ import absolute_import
+from __future__ import print_function
+import six.moves.http_client
 import os
-import urlparse
+import six.moves.urllib.parse
 import subprocess
 import time
+import platform
 
 from common.test_bed import TBTestBed
 from common.project import TBProject
@@ -24,19 +27,22 @@ from interpreter.TBTAFInterpreter import TBTAFInterpreter
 from discoverer.discoverer import TBTAFDiscoverer
 from publisher.TBTAFPublisher import TBTAFPublisher
 from executor.Executor import TBTAFExecutor
+from databridge.TBTAFDataBridge import TBTAFDatabridge
 
 class TBTAFOrchestrator(object):
 	
 	INVALID_ARGUMENT_EXCEPTION_TEXT = 'Invalid Argument Exception'
 	
 	def __init__(self, nameInitizalizationFile = None):
+		_databridge = TBTAFDatabridge('TBTAFOracleDatabridge')
+		_databridge.connect()
 		if nameInitizalizationFile is None:
 			self.projectList = []
 		else:
 			if not self.isInvalidFile(nameInitizalizationFile):
 				self.projectList = []
 			else:
-				print 'Error: TBTAFOrchestrator.__init__'
+				print('Error: TBTAFOrchestrator.__init__')
 
 	def addProject(self, newProject):
 		self.projectList.append(newProject)
@@ -44,7 +50,7 @@ class TBTAFOrchestrator(object):
 	def createNewProject(self, tBTestSuiteInstance, tBTestBedInstance, projectName):
 		#Revisar si es la forma pythonesca y si funcionan.
 		if self.isInvalidArgument(tBTestSuiteInstance) or self.isInvalidArgument(tBTestBedInstance) or self.isInvalidArgument(projectName):
-			print 'Error: TBTAFOrchestrator.createNewProject'
+			print('Error: TBTAFOrchestrator.createNewProject')
 		else:
 			if projectName in [projectInstance.projectName for projectInstance in self.projectList]:
 				raise ValueError("Already Existing Project Exception")
@@ -52,11 +58,11 @@ class TBTAFOrchestrator(object):
 				project =  TBProject(tBTestSuiteInstance, tBTestBedInstance, projectName)
 				self.addProject(project) 
 				#Agregar mensajes de confirmacion en linea de comandos
-				print 'New project created: ', projectName
+				print('New project created: ', projectName)
 				#Duda: Si es un Smart Test Suite, hay que poner todos? porque no se reciben etiquetas como parametro, solo el TBTestSuiteInstance
 				#Duda: Que pasa si llamamos a gestTestCases() para un smart suite... se corre el de TBTestSuite o de TBSmartTestSuite?
-				print 'Number of tests: ', len(tBTestSuiteInstance.getTestCases()) 
-				print 'Execution nodes: ', ', '.join([testNode.getNodeURL() for testNode in tBTestBedInstance.getTestBedNodes()])
+				print('Number of tests: ', len(tBTestSuiteInstance.getTestCases())) 
+				print('Execution nodes: ', ', '.join([testNode.getNodeURL() for testNode in tBTestBedInstance.getTestBedNodes()]))
 
 	def parseScript(self, filePath):
 		_interpreter = TBTAFInterpreter()
@@ -68,18 +74,18 @@ class TBTAFOrchestrator(object):
 		isValidUrlList = True
 		
 		if  self.isInvalidArgument(urlList):
-			print 'Error: TBTAFOrchestrator.createTestBed'
+			print('Error: TBTAFOrchestrator.createTestBed')
 		else:
 			for url in urlList:
 				if self.validateUrl(url):
 					tBtestBedInstance.addExecutionNode(url)
 				else:
 					isValidUrlList = False
-					print 'Error: TBTAFOrchestrator.createTestBed'
+					print('Error: TBTAFOrchestrator.createTestBed')
 					break
 				
 			if isValidUrlList:
-				print 'New test bed created on: ', urlList
+				print('New test bed created on: ', urlList)
 				return tBtestBedInstance
 			else:
 				return
@@ -88,8 +94,8 @@ class TBTAFOrchestrator(object):
 	#tagList - Optional String containing the list of tags which are desired to be executed among the existing test code within the specified location.
 	def createTestSuite(self, filePath, tagList = None):	
 		if self.isInvalidPath(filePath):
-			print 'filePath'
-			print 'Error: TBTAFOrchestrator.createTestSuite'
+			print('filePath')
+			print('Error: TBTAFOrchestrator.createTestSuite')
 		else:
 			_discoverer = TBTAFDiscoverer()
 			testCaseList = _discoverer.LoadTests(filePath)
@@ -99,13 +105,13 @@ class TBTAFOrchestrator(object):
 				_testSuite = TBTestSuite(TBTAFTestSuiteType.NORMAL, testSuiteID)
 				_testSuite.addTestCaseList(testCaseList)
 				
-				print 'Test ', testSuiteID, ' loaded from: ', filePath
-				print 'Test suite created with ', len(_testSuite.getTestCases()), ' test cases'
+				print('Test ', testSuiteID, ' loaded from: ', filePath)
+				print('Test suite created with ', len(_testSuite.getTestCases()), ' test cases')
 				return _testSuite
 			else:
 				if self.isInvalidList(tagList):
-					print 'tagList'
-					print 'Error: TBTAFOrchestrator.createTestSuite'
+					print('tagList')
+					print('Error: TBTAFOrchestrator.createTestSuite')
 					return 
 				else:
 					_smartTestSuite = TBSmartTestSuite(testSuiteID)
@@ -115,8 +121,8 @@ class TBTAFOrchestrator(object):
 					_smartTestSuite.clearTestCaseList()
 					_smartTestSuite.addTestCaseList(filteredTestCases)
 					
-					print 'Test ', testSuiteID, ' loaded from: ', filePath
-					print 'Smart test suite created with ', len(_smartTestSuite.getTestCases()), ' test cases'								
+					print('Test ', testSuiteID, ' loaded from: ', filePath)
+					print('Smart test suite created with ', len(_smartTestSuite.getTestCases()), ' test cases')								
 					return _smartTestSuite	
 	
 	#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the test plan will be generated.
@@ -126,7 +132,7 @@ class TBTAFOrchestrator(object):
 	def publishTestPlan(self, tbTestSuiteInstance, testPlanLocation, outputFormat = 'html'):
 		#_publisher = TBTAFPublisher()
 		TBTAFPublisher().PublishTestPlan(tbTestSuiteInstance, testPlanLocation, outputFormat)
-		print 'Test plan published at: ', testPlanLocation
+		print('Test plan published at: ', testPlanLocation)
 
 	#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the result report will be generated.
 	#resultLocation - String specifying the location where the result report wants to be placed.
@@ -134,7 +140,23 @@ class TBTAFOrchestrator(object):
 
 	def publishResultReport(self, tbTestSuiteInstance, resultLocation, outputFormat = 'html'):
 		TBTAFPublisher().PublishResultReport(tbTestSuiteInstance, resultLocation, outputFormat)
-		print 'Test result created at: ', resultLocation
+		print('Test result created at: ', resultLocation)
+
+	#tbTestSuiteInstance - Reference to a given TBTestSuite instance which will be inserted
+
+	def storeResultReport(self, tbTestSuiteInstance):
+		id = self._databridge.storeResult(tbTestSuiteInstance)
+		print('Testsuite result stored with id: ', id)
+
+
+	#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the result report will be generated.
+	#resultLocation - String specifying the location where the result report wants to be placed.
+	#outputFormat - Enumeration flag specifying the output format of the created result report.
+
+	def getResultReport(self, suiteId, resultLocation, outputFormat = 'html'):
+		TBTAFPublisher().PublishResultReport(self._databridge.getTestResultBySuiteId(suiteId), resultLocation, outputFormat)
+		print('Test result created at: ', resultLocation)
+		
 
 		#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the result report will be generated.
         #tbTestSuiteInstance - Reference of the TBTestSuite representing the set of tests that will be executed.
@@ -164,15 +186,15 @@ class TBTAFOrchestrator(object):
 		#If the provided Project key does not exist on the currently connected datasource, then a Not Existing Project Exception will be thrown.
 		#If the provided filtering enumeration is provided, then a Not Supported Filter Exception will be thrown. -- What's this?
 		if self.isInvalidArgument(projectName):
-			print 'Error: TBTAFOrchestrator.GetTests'
+			print('Error: TBTAFOrchestrator.GetTests')
 		elif not self.isExistingProject(projectName):
-			print 'Error: TBTAFOrchestrator.GetTests'
+			print('Error: TBTAFOrchestrator.GetTests')
 		elif self.isInvalidList(tagList):
-			print 'Error: TBTAFOrchestrator.GetTests'
+			print('Error: TBTAFOrchestrator.GetTests')
 		#I think this is what Pablo means in the iii. exception description. 
 		#Do I need to use the TBTAFFilterType.IN or TBTAFFilterType.OUT values?
 		elif not self.isSupportedFilter(filterType):
-			print 'Error: TBTAFOrchestrator.GetTests'
+			print('Error: TBTAFOrchestrator.GetTests')
 		else:
 			#Get TBProject object related to our projectName
 			projectInstance = next((project for project in self.projectList if project.projectName == projectName), None)
@@ -182,7 +204,7 @@ class TBTAFOrchestrator(object):
 			#si el proyecto tiene ligado un TBTestSuite, como puedo usar getTestCases() de TBSmartTestSuite para filtrar por Tag. En caso que siguiente exception no deba levantarse.
 			if tbTestSuite.getTestSuiteType() == TBTAFTestSuiteType.NORMAL and len(tagList):
 				raise ValueError("Normal TBTestSuite not compatible with Tag list Exception")
-				print 'Error: TBTAFOrchestrator.GetTests'
+				print('Error: TBTAFOrchestrator.GetTests')
 			else:
 				#Check what type of Test Suite that project has and action accordingly
 				#Get initial list of test cases. This depends on what type of TBTestSuite we have. 
@@ -204,7 +226,7 @@ class TBTAFOrchestrator(object):
 				for tag in tagDictionary:
 					d[tag] = self.getTestsForTag(queriedTests, tag)
 				for tagkey, testIds in d.items(): #CHANGE testIds
-					print tagkey, ': ', ', '.join(str(x) for x in testIds)
+					print(tagkey, ': ', ', '.join(str(x) for x in testIds))
 				return d  
 				
 	def getTestsForTag(self, testList, tag): 
@@ -227,9 +249,9 @@ class TBTAFOrchestrator(object):
 	#projectName - String describing the project from which the query is being made.
 	def getTags(self, projectName, printFlag = 'Y'):
 		if self.isInvalidArgument(projectName):
-			print 'Error: TBTAFOrchestrator.GetTags'
+			print('Error: TBTAFOrchestrator.GetTags')
 		elif not self.isExistingProject(projectName):
-			print 'Error: TBTAFOrchestrator.GetTags'
+			print('Error: TBTAFOrchestrator.GetTags')
 		else:
 			tagList = []
 			projectInstance = next((project for project in self.projectList if project.projectName == projectName), None)
@@ -243,7 +265,7 @@ class TBTAFOrchestrator(object):
 						if tag not in tagList:
 							tagList.append(tag)
 			if printFlag == 'Y':
-				print 'Tags: ', ', '.join(tagList)
+				print('Tags: ', ', '.join(tagList))
 			return tagList
 		
 	#Validations
@@ -268,7 +290,7 @@ class TBTAFOrchestrator(object):
 		
 	def isInvalidFile(self, fileName):
 		if not os.path.isfile(fileName):
-			print 'Invalid file: ', fileName
+			print('Invalid file: ', fileName)
 			raise ValueError(self.INVALID_ARGUMENT_EXCEPTION_TEXT)
 			return True
 		return False
@@ -287,9 +309,15 @@ class TBTAFOrchestrator(object):
 
 	def validateUrl(self, url):
 		DEVNULL = open(os.devnull, 'w')
-		response = subprocess.call("ping -n 1 " + url, stdout = DEVNULL, stderr = DEVNULL)
+		os_name = platform.system()
+		base_command = ''
+		if os_name == 'Darwin':
+			base_command = 'ping -c 1 '
+		else :
+			base_command = 'ping -n 1 '
+		response = subprocess.call(base_command + url, stdout = DEVNULL, stderr = DEVNULL, shell=True)
 		valid = response == 0
 		if not valid:
-			print 'Invalid URL:', url
+			print('Invalid URL:', url)
 			raise ValueError(self.INVALID_ARGUMENT_EXCEPTION_TEXT)
 		return valid

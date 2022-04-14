@@ -1,10 +1,12 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import unittest
 
 from discoverer.discoverer import TBTAFDiscoverer
 
 class PruebaArchivosPy(unittest.TestCase):
     def setUp(self):
-        print "loading individual test..."
+        print("loading individual test...")
         pass
     
     def test_PathValido(self):
@@ -13,7 +15,7 @@ class PruebaArchivosPy(unittest.TestCase):
         except ValueError as e:
             self.fail("Invalid path was provided")
         else:
-            print pyFiles
+            print(pyFiles)
             pass
         
     def test_PathInvalido(self):

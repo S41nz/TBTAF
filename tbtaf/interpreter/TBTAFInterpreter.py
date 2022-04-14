@@ -3,13 +3,15 @@ Crstr(e)atstr(e)d on 22/11/2015
 @author:
 '''
 
-from exceptions import IOError
-import re
+from __future__ import absolute_import
+from __future__ import print_function
+# from exceptions import IOError
+import regex as re
 import os as _os
 import sys
-from result import Result
-from status import TBTAFParsingScriptStatus
-from parsing_summary import ParsingSummary
+from .result import Result
+from .status import TBTAFParsingScriptStatus
+from .parsing_summary import ParsingSummary
 from common.enums.filter_type import TBTAFFilterType
 import orchestrator.TBTAFOrchestrator
 from common.exception.IllegalArgumentException import IllegalArgumentException
@@ -35,6 +37,7 @@ class TBTAFInterpreter(object):
     FILTER_PARAM = "filter"
     FORMAT_PARAM = "format"
     URL_LIST_PARAM = "urlList"
+    TEST_SUITE_ID_PARAM = "testSuiteId"
 
     ##Available commands
     CREATE_TEST_BED = "create_test_bed"
@@ -45,6 +48,8 @@ class TBTAFInterpreter(object):
     PUBLISH_TEST_RESULT = "publish test_results"
     GET_TEST = "get_tests"
     GET_TAGS = "get_tags"
+    STORE_TEST_RESULT = "ingest test_results"
+    GET_TEST_RESULT = "get test_results"
 
     ##Patterns
     TEST_SUITE = "(?P<"+ TEST_SUITE_PARAM +">(\w+))"
@@ -54,6 +59,7 @@ class TBTAFInterpreter(object):
     TAG_LIST = "\[(?P<"+ TAG_LIST_PARAM +">((\"\w+\")(,\"\w+\")*))\]"
     FILTER = "(?P<"+ FILTER_PARAM +">(\w+))"
     FORMAT = "(?P<"+ FORMAT_PARAM +">(\w+))"
+    TEST_SUITE_ID = "(?P<"+ TEST_SUITE_ID_PARAM +">(\w+))"
     FLAG_LIST_1 = "\[(?P<"+ FLAG_LIST_PARAM_1 +">((\w+)(,\w+)*))\]"
     FLAG_LIST_2 = "\[(?P<"+ FLAG_LIST_PARAM_2 +">((\w+)(,\w+)*))\]"
     ##URL_LIST = "(?P<"+ URL_LIST_PARAM +">(("+ urlPattern +")(,"+ urlPattern +")*))"
@@ -76,8 +82,8 @@ class TBTAFInterpreter(object):
     f = "(?P<method>\\publish test_results\\b)\("+ TEST_SUITE +","+ FILE_PATH +","+ FORMAT +"\)"
     g = "(?P<method>\\get_tests\\b)\("+ PROJECT_NAME +"((\,"+ TAG_LIST +"),"+ FILTER +")?\)"
     h = "(?P<method>\\get_tags\\b)\("+ PROJECT_NAME +"\)"
-
-    ##print c
+    i = "(?P<method>\\ingest test_results\\b)\("+ TEST_SUITE +"\)"
+    j = "(?P<method>\\get test_results\\b)\("+ TEST_SUITE_ID +","+ FILE_PATH +","+ FORMAT +"\)"
 
     def __init__(self):
         '''
@@ -152,8 +158,9 @@ class TBTAFInterpreter(object):
         TBTAFInterpreter.EXECUTE            :TBTAFInterpreter.e,
         TBTAFInterpreter.PUBLISH_TEST_RESULT:TBTAFInterpreter.f,
         TBTAFInterpreter.GET_TEST           :TBTAFInterpreter.g,
-        TBTAFInterpreter.GET_TAGS           :TBTAFInterpreter.h}
-
+        TBTAFInterpreter.GET_TAGS           :TBTAFInterpreter.h,
+        TBTAFInterpreter.STORE_TEST_RESULT  :TBTAFInterpreter.i,
+        TBTAFInterpreter.GET_TEST_RESULT  :TBTAFInterpreter.j}
         ##________Read each line of the file and look for a match of defined methods________
         for i, line in enumerate(file):
             ##________Delete White Spaces from the corners________
@@ -165,11 +172,9 @@ class TBTAFInterpreter(object):
                 continue
             elif (line.startswith("//")):
                 continue
-
             for command in mappingPatterns:
                 if (command in line):
                     m = re.match(mappingPatterns[command],line)
-
                     if (m is None):
                         result.status  = TBTAFParsingScriptStatus.ERROR
                         result.message = self._formatMsg(fileName, lineNumber, "Cannot find command", TBTAFInterpreter.MSG_ERROR)
@@ -190,7 +195,6 @@ class TBTAFInterpreter(object):
     def _addToSummary(self,m, fileName, lineNumber):
         m[TBTAFInterpreter.FILE_NAME] = fileName
         m[TBTAFInterpreter.FILE_LINE_NUMBER] = lineNumber
-
         error = '{} is not defined.'
         command = m["method"]
 
@@ -243,6 +247,15 @@ class TBTAFInterpreter(object):
                 return self._formatMsg(fileName, lineNumber, error, TBTAFInterpreter.MSG_ERROR)
 
             TBTAFInterpreter.summary.getTags.append(m)
+            
+        elif (command == TBTAFInterpreter.STORE_TEST_RESULT):
+            if not(m[TBTAFInterpreter.TEST_SUITE_PARAM] in TBTAFInterpreter.summary.createTestSuite):
+                error = error.format(m[TBTAFInterpreter.TEST_SUITE_PARAM])
+                return self._formatMsg(fileName, lineNumber, error, TBTAFInterpreter.MSG_ERROR)
+            TBTAFInterpreter.summary.storeTestResults.append(m)
+
+        elif (command == TBTAFInterpreter.GET_TEST_RESULT):
+            TBTAFInterpreter.summary.getTestResults.append(m)            
         error = ""
         return error
 
@@ -297,7 +310,7 @@ class TBTAFInterpreter(object):
                 orchestrator.createNewProject(testSuite, testBed, projectName)
 
         except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
-            print self._formatMsg(fileName, lineNumber, "Fatal Error. Execution cannot continue. " + str(e), TBTAFInterpreter.MSG_ERROR)
+            print(self._formatMsg(fileName, lineNumber, "Fatal Error. Execution cannot continue. " + str(e), TBTAFInterpreter.MSG_ERROR))
 
         #ExecuteTests
         try:
@@ -328,7 +341,7 @@ class TBTAFInterpreter(object):
                 objs[var] = orchestrator.executeTestSuite(testSuite, testBed, flagList1, flagList2)
 
         except ValueError as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_ERROR)
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_ERROR))
             return
 
         #PublishTestPlan
@@ -345,7 +358,7 @@ class TBTAFInterpreter(object):
                 orchestrator.publishTestPlan(testSuite, filePath, format)
 
         except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING))
 
         #PublishResultReport
         try:
@@ -360,7 +373,34 @@ class TBTAFInterpreter(object):
                 orchestrator.publishResultReport(testSuite, filePath, format)
 				
         except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING))
+
+        #StoreResultReport
+        try:
+            for var in TBTAFInterpreter.summary.storeTestResults:
+                fileName = var[TBTAFInterpreter.FILE_NAME]
+                lineNumber = var[TBTAFInterpreter.FILE_LINE_NUMBER]
+
+                testSuite= objs[var[TBTAFInterpreter.TEST_SUITE_PARAM]]
+
+                orchestrator.storeResultReport(testSuite)
+				
+        except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING))
+
+        #GetResultReport
+        try:
+            for var in TBTAFInterpreter.summary.getTestResults:
+                fileName = var[TBTAFInterpreter.FILE_NAME]
+                lineNumber = var[TBTAFInterpreter.FILE_LINE_NUMBER]
+
+                testSuiteId= var[TBTAFInterpreter.TEST_SUITE_ID_PARAM]
+                filePath = var[TBTAFInterpreter.FILE_PATH_PARAM]
+                format = var[TBTAFInterpreter.FORMAT_PARAM]
+                orchestrator.getResultReport(testSuiteId, filePath, format)
+				
+        except (ValueError, IllegalArgumentException, NonSupportedFormatException) as e:
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING))
 
         #GetTests
         try:
@@ -387,7 +427,7 @@ class TBTAFInterpreter(object):
                     orchestrator.getTests(projectName, tagList, filter)
 
         except ValueError as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING))
 
         #GetTags
         try:
@@ -400,4 +440,4 @@ class TBTAFInterpreter(object):
                 orchestrator.getTags(projectName)
 
         except ValueError as e:
-            print self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING)
+            print(self._formatMsg(fileName, lineNumber, str(e), TBTAFInterpreter.MSG_WARNING))

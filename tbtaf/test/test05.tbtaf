@@ -1,0 +1,3 @@
+// 1.-Get the result test from the DataBase
+// 2.-Export the resulto into a PDF File
+get test_results(41,"./SampleResultFromDB.pdf",PDF)

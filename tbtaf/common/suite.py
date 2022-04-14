@@ -3,6 +3,7 @@ Created on 05/11/2015
 
 @author: S41nz
 '''
+from __future__ import absolute_import
 import sys
 import datetime
 from common.result import TBTAFResult
@@ -120,7 +121,7 @@ class TBTestSuite(object):
         # First the verdict
         if len(self.suiteTestCases) == passTests:
             candidateVerdict = TBTAFVerdictType.PASS
-        elif failedTests is not 0:
+        elif failedTests != 0:
             candidateVerdict = TBTAFVerdictType.FAIL
         else:
             candidateVerdict = TBTAFVerdictType.INCONCLUSIVE

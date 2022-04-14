@@ -4,6 +4,7 @@ Created on 03/11/2015
 @author: S41nz
 '''
 
+from __future__ import absolute_import
 from common.enums.event_type import TBTAFEventType
 
 class TBTAFTrace(object):

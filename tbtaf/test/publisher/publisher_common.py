@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from common.metadata import TBMetadata
 from common.sample_test import TBTAFSampleTest
 from common.suite import TBTestSuite

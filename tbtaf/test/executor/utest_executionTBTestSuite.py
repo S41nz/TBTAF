@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 from executor.Executor import TBTAFExecutor
 from executor.ExecutionTBTestSuite import ExecutionTBTestSuite
 from common.suite import TBTestSuite
@@ -5,6 +7,7 @@ from common.sample_test import TBTAFSampleTest
 from common.enums.execution_status_type import TBTAFExecutionStatusType
 import time
 import sys
+from six.moves import range
 
 total = 0
 passed = 0
@@ -18,10 +21,10 @@ def testInvalid(method):
         sys.stdout = open('trash', 'w')
         globals()[method]()
         sys.stdout = save_stdout
-        print method + ': exception expected but not thrown'
+        print(method + ': exception expected but not thrown')
     except:
         sys.stdout = save_stdout
-        print method + ": PASSED"
+        print(method + ": PASSED")
         passed = passed + 1
 
 def testValid(method):
@@ -34,11 +37,11 @@ def testValid(method):
         sys.stdout = open('trash', 'w')
         globals()[method]()
         sys.stdout = save_stdout
-        print method + ": PASSED"
+        print(method + ": PASSED")
         passed = passed + 1
     except Exception as e:
         sys.stdout = save_stdout
-        print method + ': exception not expected but thrown: ' + str(e)
+        print(method + ': exception not expected but thrown: ' + str(e))
 
 # TESTS #
 def invalidGetBySuite():
@@ -186,4 +189,4 @@ testValid('validAbortRestart')
 testValid('validGetRunStatus')
 testInvalid('invalidGetRunStatus')
 
-print "Passed " + str(passed) + " out of " + str(total)
+print("Passed " + str(passed) + " out of " + str(total))

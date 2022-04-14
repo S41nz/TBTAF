@@ -1,8 +1,3 @@
-'''
-Created on 04/11/2015
-
-@author: psainza
-'''
 from __future__ import absolute_import
 from __future__ import print_function
 from common.test import TBTestCase
@@ -14,35 +9,29 @@ from common.enums.event_type import TBTAFEventType
 from common.metadata import TBMetadata
 import time
 
-class TBTAFSampleTest(TBTestCase):
+class TBTAFPrintableTest(TBTestCase):
     '''
     classdocs
     '''
 
     
         
-    def __init__(self):
+    def __init__(self, result, metadata):
         '''
         Constructor
         '''
-        self.testResult = TBTAFResult(TBTAFVerdictType.INCONCLUSIVE,"TBTAFSampleTest")
+        self.testResult = result
         self.testTrace = None
-        self.testTimeout = 1984
-        self.testMetadata = TBMetadata('TEST')
+        self.testTimeout = 1994
+        self.testMetadata = metadata
         
     def setup(self):
         TBTestCase.setup(self)
-        print("Setup performed from TBTAFSampleTest")
-        self.testTrace = TBTAFTrace("TBTAFSampleTest")
-        self.testTrace.addEvent(TBTAFEvent(TBTAFEventType.INFO,"Setup performed from TBTAFSampleTest",self.testTrace.getTraceSource()))
         
 
 
     def execute(self):
-        time.sleep(7)
         TBTestCase.execute(self)
-        print("Execute performed from TBTAFSampleTest")
-        self.testResult = TBTAFResult(TBTAFVerdictType.PASS,"TBTAFSampleTest")
 
 
     def cleanup(self):

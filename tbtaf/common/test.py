@@ -4,16 +4,14 @@ Created on 04/11/2015
 @author: S41nz
 '''
 
+from __future__ import absolute_import
 from abc import ABCMeta, abstractmethod
-from _pyio import __metaclass__
+import six
 
-class TBTestCase:
+class TBTestCase(six.with_metaclass(ABCMeta)):
     '''
     Abstract class that defines the base functionality that every test case within the TBTAF should implement
     '''
-    
-    #Tag the class as an abstract one
-    __metaclass__ = ABCMeta
 
     
     #Methods

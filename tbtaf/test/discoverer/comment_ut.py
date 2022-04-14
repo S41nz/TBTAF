@@ -4,6 +4,7 @@ Created on 25/11/2015
 @author: alberto
 '''
 
+from __future__ import absolute_import
 import unittest
 
 from discoverer.discoverer import TBTAFDiscoverer

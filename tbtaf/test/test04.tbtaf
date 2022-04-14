@@ -1,16 +1,15 @@
-//TBTAF Integration test 02
+//TBTAF Integration test 01
 //Description:
 //1.-Create a simple test suite
 //2.-Create a test bed
 //3.-Create a TBTAF project to be stored in DB
-//4.-Publish the test plan based on the created test suite
-
+//4.-Store the TestSuite result into the oracle DB
 myTestBed = create_test_bed()
 //After the command above the following output on console is expected:
 //New test bed created on: localhost
 
 //Replace TEST_CONTENT_LOCATION by the actual location on the repo for the test TBTestCases
-myTestSuite = create_test_suite("./test/discoverer/samples")
+myTestSuite = create_test_suite("../test/smoke")
 //After the command above the following output on console is expected:
 // For each discovered test
 // Test <Test ID> loaded from: <Complete test filepath>
@@ -18,13 +17,19 @@ myTestSuite = create_test_suite("./test/discoverer/samples")
 // Test suite created with <number of loaded tests> test cases
 
 //Create the test project.
-create_new_project(myTestSuite,myTestBed,"TBTAF Smoke test project 02")
+create_new_project(myTestSuite,myTestBed,"TBTAF Smoke test project 04")
 //After the command above the following output on console is expected:
-//New project created: TBTAF Smoke test project 02
+//New project created: TBTAF Smoke test project 03
 //Number of tests: <Number of contained tests>
 //Execution nodes: localhost
 
-//Replace TEST_PLAN_LOCATION by the actual location on the repo for the test plan HTML
-publish test_plan(myTestSuite,"./test/discoverer/samples/SmokeTestReport.html",HTML)
+myResult = execute(myTestSuite,myTestBed)
 //After the command above the following output on console is expected:
-//Test plan published at: TEST_PLAN_LOCATION
+//Executing: <Test ID> Progress: [0-100%]
+
+//Replace TEST_RESULT_LOCATION by the actual location on the repo for the test result of the test execution
+publish test_results(myTestSuite,"./test/discoverer/samples/SmokeResultReport.html",HTML)
+//After the command above the following output on console is expected:
+//Test result created at: TEST_RESULT_LOCATION
+ingest test_results(myTestSuite)
+

@@ -1,7 +1,9 @@
+from __future__ import absolute_import
 from executor.Executor import TBTAFExecutor
 from common.suite import TBTestSuite
 from common.sample_test import TBTAFSampleTest
 import time
+from six.moves import range
 
 def sample_run():
     ejecutor = TBTAFExecutor()
