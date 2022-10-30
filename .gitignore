@@ -2,3 +2,5 @@
 .vscode/launch.json
 adb_virt_env/
 .DS*
+#*.properties
+*.log
