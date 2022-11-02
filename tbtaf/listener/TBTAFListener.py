@@ -56,7 +56,7 @@ class TBTAFListener(object):
             logging.info(f'Cloning {event.repo.url.replace("api.", "").replace("repos/", "")}.git ...')
             repo = Repo.clone_from(
                 f'{event.repo.url.replace("api.", "").replace("repos/", "")}.git',
-                f'{path_to_clone}{event.id}/',
+                f'{os.path.expanduser("~")}/{path_to_clone}{event.id}/',
                 branch=f'{event.payload.ref.split("/")[TBTAFListener.BRANCH_POSITION]}'
             )
             logging.info(f'Cloned {event.repo.url.replace("api.", "").replace("repos/", "")}.git')
