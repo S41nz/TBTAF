@@ -22,6 +22,7 @@ class GitPushEvents(object):
             f'{base_url}/{user}/{repo}/events?type=PushEvents', headers=headers)
         events = json.loads(
             response.content, object_hook=lambda d: Namespace(**d))
+        print(str(events))
         events.sort(key=id, reverse=True)
 
         final_events = list(filter(lambda ev: int(ev.id) > latest_id, events))

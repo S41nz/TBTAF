@@ -9,5 +9,13 @@ from orchestrator.TBTAFOrchestrator import TBTAFOrchestrator
 from listener.TBTAFListener import TBTAFListener
 
 if __name__ == '__main__':
-    listener = TBTAFListener() 
-    listener.check_push_events('./test/test05.tbtaf')
+    testScript = './test/test04.tbtaf'
+    myTBTAF = TBTAFOrchestrator()
+    
+    print("Executing the following test script: " + testScript)
+    
+    parseResult = myTBTAF.parseScript(testScript)
+
+    print("Parse Status: "+parseResult.status)
+
+    print("Parse Message"+parseResult.message)

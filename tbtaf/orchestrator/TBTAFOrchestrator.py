@@ -1,4 +1,5 @@
 '''
+S41nz 		05/07/2023	Corrected the hardcoding to enable the Oracle Databridge by default 
 Created on 02/11/2015
 
 @author: 
@@ -33,9 +34,10 @@ class TBTAFOrchestrator(object):
 	
 	INVALID_ARGUMENT_EXCEPTION_TEXT = 'Invalid Argument Exception'
 	
-	def __init__(self, nameInitizalizationFile = None):
-		_databridge = TBTAFDatabridge('TBTAFOracleDatabridge')
-		_databridge.connect()
+	def __init__(self, nameInitizalizationFile = None,targetDatabridge = None):
+		_databridge = targetDatabridge
+		if _databridge is not None:
+			_databridge.connect()
 		if nameInitizalizationFile is None:
 			self.projectList = []
 		else:
@@ -145,8 +147,9 @@ class TBTAFOrchestrator(object):
 	#tbTestSuiteInstance - Reference to a given TBTestSuite instance which will be inserted
 
 	def storeResultReport(self, tbTestSuiteInstance):
-		id = self._databridge.storeResult(tbTestSuiteInstance)
-		print('Testsuite result stored with id: ', id)
+		if self._databridge is not None:
+			id = self._databridge.storeResult(tbTestSuiteInstance)
+			print('Testsuite result stored with id: ', id)
 
 
 	#tbTestSuiteInstance - Reference to a given TBTestSuite instance from which the result report will be generated.
