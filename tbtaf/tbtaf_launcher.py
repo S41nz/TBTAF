@@ -11,13 +11,10 @@ from interpreter.TBATFInterpreterCLI import TBTAFInterpreterCLI
 import sys
 
 if __name__ == '__main__':
-    ubicacion = './test/temp.tbtaf'
-    comando = ""
-    
     if len(sys.argv) > 1:
-        if sys.argv[1] == '-interactive':
+        if sys.argv[1].lower() == '-interactive':
             tbtafcli = TBTAFInterpreterCLI()
-            tbtafcli.main()
+            tbtafcli.execute()
             
     else:
         testScript = './test/test02.tbtaf'
