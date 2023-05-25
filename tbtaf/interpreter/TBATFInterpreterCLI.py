@@ -26,11 +26,11 @@ class TBTAFInterpreterCLI(object):
             return
         
     def commandInterpreter(self):
-        if self.command == 'quit()' or self.command == 'Quit()' or self.command == 'QUIT()':
+        if self.command.lower() == 'quit()':
             print('exiting interpreter.')
             _os.remove("temp.tbtaf")
             sys.exit()
-        elif self.command == 'execute()' or self.command == 'Execute()' or self.command == 'EXECUTE()':
+        elif self.command.lower() == 'execute()':
             try:
                 if _os.path.getsize(self.path) > 0:
                     parseResult = self.myTBTAF.parseScript(self.path)
@@ -40,8 +40,6 @@ class TBTAFInterpreterCLI(object):
                     print("No commands found")
             except:
                 print("No commands found")
-        # elif self.command == 'clear' or self.command == 'Clear' or self.command == 'CLEAR':
-        #     _os.remove("temp.tbtaf")
 
         else:
             try:
@@ -52,8 +50,8 @@ class TBTAFInterpreterCLI(object):
             except:
                 return 0
 
-    def main(self):
+    def execute(self):
         while True:
-            self.command = input('>>> ')
+            self.command = input('[TBTAF]>>>')
 
             self.commandInterpreter()
