@@ -4,3 +4,11 @@ adb_virt_env/
 .DS*
 #*.properties
 *.log
+
+client/node_modules
+client/.vscode/launch.json
+client/.vscode/settings.json
+client/.vscode/tasks.json
+client/.angular
+server/venv
+pysci

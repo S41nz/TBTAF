@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Web IDE</title>
+    <link rel="stylesheet" href="https://unpkg.com/xterm/css/xterm.css" />
+</head>
+<body>
+    <div id="app"></div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://unpkg.com/xterm/lib/xterm.js"></script>
+    <script src="https://unpkg.com/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
