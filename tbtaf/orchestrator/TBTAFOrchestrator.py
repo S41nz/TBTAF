@@ -13,6 +13,10 @@ import six.moves.urllib.parse
 import subprocess
 import time
 import platform
+import json
+from filelock import FileLock
+import datetime
+
 
 from common.test_bed import TBTestBed
 from common.project import TBProject
@@ -35,9 +39,9 @@ class TBTAFOrchestrator(object):
 	INVALID_ARGUMENT_EXCEPTION_TEXT = 'Invalid Argument Exception'
 	
 	def __init__(self, nameInitizalizationFile = None,targetDatabridge = None):
-		_databridge = targetDatabridge
-		if _databridge is not None:
-			_databridge.connect()
+		self._databridge = targetDatabridge
+		if self._databridge is not None:
+			self._databridge.connect()
 		if nameInitizalizationFile is None:
 			self.projectList = []
 		else:
@@ -94,14 +98,14 @@ class TBTAFOrchestrator(object):
 	
 	#filePath - String containing the filepath where the test cases are located.
 	#tagList - Optional String containing the list of tags which are desired to be executed among the existing test code within the specified location.
-	def createTestSuite(self, filePath, tagList = None):	
+	def createTestSuite(self, test_id, filePath, tagList = None):	
 		if self.isInvalidPath(filePath):
 			print('filePath')
 			print('Error: TBTAFOrchestrator.createTestSuite')
 		else:
 			_discoverer = TBTAFDiscoverer()
 			testCaseList = _discoverer.LoadTests(filePath)
-			testSuiteID = 'testSuiteID_01'
+			testSuiteID = test_id
 			
 			if tagList is None:
 				_testSuite = TBTestSuite(TBTAFTestSuiteType.NORMAL, testSuiteID)
@@ -171,11 +175,51 @@ class TBTAFOrchestrator(object):
 		_executor = TBTAFExecutor()
 		suiteResult = _executor.executeTests(tbTestSuiteInstance, testBed, flagsCollection, executorListenerCollection)
 
+		# Archivo para estados parciales
+		partial_results_file = "execution_status.json"
+		lock = FileLock(partial_results_file + ".lock")
+
 		waitingComplete = True
 		while waitingComplete:
 			result = _executor.getStatus(tbTestSuiteInstance)
+
+			# Guardar o actualizar estado parcial
+			with lock:
+				try:
+					# Leer datos actuales del archivo
+					current_data = self.get_execution_state(partial_results_file)
+					if current_data is None:
+						current_data = []
+
+					# Preparar el nuevo estado parcial
+					partial_state = {
+						"suite_id": tbTestSuiteInstance.getSuiteID(),
+						"status": result.getExecutionStatusType(),
+						"timestamp": datetime.datetime.now().isoformat()
+					}
+
+					# Buscar si el suite_id ya existe
+					updated = False
+					for entry in current_data:
+						if entry["suite_id"] == tbTestSuiteInstance.getSuiteID():
+							entry.update(partial_state)
+							updated = True
+							break
+
+					# Si no existe, añadirlo
+					if not updated:
+						current_data.append(partial_state)
+
+					# Escribir los datos actualizados en el archivo
+					with open(partial_results_file, "w") as file:
+						json.dump(current_data, file, indent=4)
+
+				except Exception as e:
+					print(f"Error al guardar estado parcial: {e}")
+
 			time.sleep(5)
 			waitingComplete = result.getExecutionStatusType() != TBTAFExecutionStatusType.COMPLETED
+
 		
 		#return suiteResult
 		#Si esto no funciona, el executor tiene que poner un metodo llamado getSuiteResult que devuelva getSuiteResult.
@@ -324,3 +368,43 @@ class TBTAFOrchestrator(object):
 			print('Invalid URL:', url)
 			raise ValueError(self.INVALID_ARGUMENT_EXCEPTION_TEXT)
 		return valid
+
+
+	def get_execution_state(self, filename='execution_results.json'):
+		"""
+		Obtiene todos los resultados almacenados en el archivo.
+		
+		:param filename: Nombre del archivo donde están los resultados.
+		:return: Lista de resultados o una lista vacía si el archivo no existe.
+		"""
+		try:
+			if os.path.exists(filename):
+				with open(filename, 'r') as file:
+					return json.load(file)
+			return []
+		except Exception as e:
+			print(f"Error al leer el estado de ejecución: {e}")
+			return []
+
+	def save_execution_state(self, execution_result, filename='execution_results.json'):
+		"""
+		Actualiza o agrega un resultado en el archivo basado en `resultSource`.
+		
+		:param execution_result: Objeto con los resultados de la ejecución.
+		:param filename: Nombre del archivo donde guardar los resultados.
+		"""
+		try:
+			current_data = self.get_execution_state(filename)
+			updated = False
+			for i, result in enumerate(current_data):
+				if result.get("resultSource") == execution_result.get("resultSource"):
+					current_data[i] = execution_result
+					updated = True
+					break
+			if not updated:
+				current_data.append(execution_result)
+			with open(filename, 'w') as file:
+				json.dump(current_data, file, indent=4)
+			print(f"Estado de ejecución actualizado en: {filename}")
+		except Exception as e:
+			print(f"Error al guardar el estado de ejecución: {e}")
