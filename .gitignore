@@ -4,3 +4,5 @@ adb_virt_env/
 .DS*
 #*.properties
 *.log
+venv
+*.pyc

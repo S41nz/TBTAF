@@ -58,3 +58,18 @@ class TBTAFResult(object):
     
     def getEndTimestamp(self):
         return self.endTimestamp
+    
+    def to_dict(self):
+        # Convertir los timestamps de datetime a cadena (si están presentes)
+        startTimestamp_str = self.startTimestamp.strftime("%Y-%m-%d %H:%M:%S") if self.startTimestamp else None
+        endTimestamp_str = self.endTimestamp.strftime("%Y-%m-%d %H:%M:%S") if self.endTimestamp else None
+        
+        return {
+            "testVerdict": self.testVerdict,
+            "resultSource": self.resultSource,
+            "passTests": self.passTests,
+            "inconclusiveTests": self.inconclusiveTests,
+            "failedTests": self.failedTests,
+            "startTimestamp": startTimestamp_str,
+            "endTimestamp": endTimestamp_str
+        }
