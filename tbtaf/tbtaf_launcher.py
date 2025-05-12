@@ -17,7 +17,7 @@ if __name__ == '__main__':
             tbtafcli.execute()
             
     else:
-        testScript = './test/test02.tbtaf'
+        testScript = './test/test05.tbtaf'
         myTBTAF = TBTAFOrchestrator()
 
         print("Executing the following test script: " + testScript)
@@ -26,6 +26,6 @@ if __name__ == '__main__':
 
         print("Parse Status: "+parseResult.status)
 
-        print("Parse Message"+parseResult.message)
+        print("Parse Message: "+parseResult.message)
 
         sys.exit()

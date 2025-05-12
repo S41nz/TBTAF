@@ -2,7 +2,6 @@
 Crstr(e)atstr(e)d on 22/11/2015
 @author:
 '''
-
 from __future__ import absolute_import
 from __future__ import print_function
 # from exceptions import IOError
@@ -24,7 +23,7 @@ class TBTAFInterpreter(object):
 
     OrchestratorReference = None
     summary = ParsingSummary()
-    urlPattern = urlPattern = "\"(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?\""
+    urlPattern = urlPattern = r'"(https?://)?([\da-z\.-]+)\.([a-z\.]{2,6})([/\w\.-]*)*/?"'
 
     ##Params in commands
     TEST_SUITE_PARAM = "testSuite"
@@ -52,19 +51,19 @@ class TBTAFInterpreter(object):
     GET_TEST_RESULT = "get test_results"
 
     ##Patterns
-    TEST_SUITE = "(?P<"+ TEST_SUITE_PARAM +">(\w+))"
-    FILE_PATH = "\"(?P<"+ FILE_PATH_PARAM +">(.+))\""
-    TEST_BED = "(?P<"+ TEST_BED_PARAM +">(\w+))"
-    PROJECT_NAME = "\"(?P<"+ PROJECT_NAME_PARAM +">(.+))\""
-    TAG_LIST = "\[(?P<"+ TAG_LIST_PARAM +">((\"\w+\")(,\"\w+\")*))\]"
-    FILTER = "(?P<"+ FILTER_PARAM +">(\w+))"
-    FORMAT = "(?P<"+ FORMAT_PARAM +">(\w+))"
-    TEST_SUITE_ID = "(?P<"+ TEST_SUITE_ID_PARAM +">(\w+))"
-    FLAG_LIST_1 = "\[(?P<"+ FLAG_LIST_PARAM_1 +">((\w+)(,\w+)*))\]"
-    FLAG_LIST_2 = "\[(?P<"+ FLAG_LIST_PARAM_2 +">((\w+)(,\w+)*))\]"
-    ##URL_LIST = "(?P<"+ URL_LIST_PARAM +">(("+ urlPattern +")(,"+ urlPattern +")*))"
-    ##URL_LIST = "(?P<"+ URL_LIST_PARAM +">(("+ "\".+\"" +")(,"+ "\".+\"" +")*))"
-    URL_LIST = "\[(?P<"+ URL_LIST_PARAM +">(("+ "\".+\"" +")(,"+ "\".+\"" +")*))\]"
+    TEST_SUITE = r"(?P<"+ TEST_SUITE_PARAM +r">(\w+))"
+    FILE_PATH = r'"(?P<'+ FILE_PATH_PARAM +r'>(.+))"'
+    TEST_BED = r"(?P<"+ TEST_BED_PARAM +r">(\w+))"
+    PROJECT_NAME = r'"(?P<'+ PROJECT_NAME_PARAM +r'>(.+))"'
+    TAG_LIST = r"\[(?P<"+ TAG_LIST_PARAM +r">((\"\w+\")(,\"\w+\")*))\]"
+    FILTER = r"(?P<"+ FILTER_PARAM +r">(\w+))"
+    FORMAT = r"(?P<"+ FORMAT_PARAM +r">(\w+))"
+    TEST_SUITE_ID = r"(?P<"+ TEST_SUITE_ID_PARAM +r">(\w+))"
+    FLAG_LIST_1 = r"\[(?P<"+ FLAG_LIST_PARAM_1 +r">((\w+)(,\w+)*))\]"
+    FLAG_LIST_2 = r"\[(?P<"+ FLAG_LIST_PARAM_2 +r">((\w+)(,\w+)*))\]"
+    ##URL_LIST = r"(?P<"+ URL_LIST_PARAM +r">(("+ urlPattern +r")(,"+ urlPattern +r")*))"
+    ##URL_LIST = r"(?P<"+ URL_LIST_PARAM +r">(("+ r'".+"' +r")(,"+ r'".+"' +r")*))"
+    URL_LIST = r"\[(?P<"+ URL_LIST_PARAM +r">(("+ r'".+"' +r")(,"+ r'".+"' +r")*))\]"
 
     ##Message Types
     MSG_ERROR = "Error"
@@ -74,16 +73,16 @@ class TBTAFInterpreter(object):
     FILE_LINE_NUMBER = "lineNumber"
 
     ##Patterns
-    a = "(?P<variable>\w+)\s*=\s*(?P<method>\\create_test_bed\\b)\(("+ URL_LIST +")?\)"
-    b = "(?P<variable>\w+)\s*=\s*(?P<method>\\create_test_suite\\b)\("+ FILE_PATH +"(,"+ TAG_LIST +")?\)"
-    c = "(?P<method>\\create_new_project\\b)\("+ TEST_SUITE +","+ TEST_BED +","+ PROJECT_NAME +"\)"
-    d = "(?P<method>\\publish test_plan\\b)\("+ TEST_SUITE +","+ FILE_PATH +","+ FORMAT +"\)"
-    e = "(?P<variable>\w+)\s*=\s*(?P<method>\\execute\\b)\("+ TEST_SUITE +","+ TEST_BED +"(,"+ FLAG_LIST_1 +")?(,"+ FLAG_LIST_2 +")?\)"
-    f = "(?P<method>\\publish test_results\\b)\("+ TEST_SUITE +","+ FILE_PATH +","+ FORMAT +"\)"
-    g = "(?P<method>\\get_tests\\b)\("+ PROJECT_NAME +"((\,"+ TAG_LIST +"),"+ FILTER +")?\)"
-    h = "(?P<method>\\get_tags\\b)\("+ PROJECT_NAME +"\)"
-    i = "(?P<method>\\ingest test_results\\b)\("+ TEST_SUITE +"\)"
-    j = "(?P<method>\\get test_results\\b)\("+ TEST_SUITE_ID +","+ FILE_PATH +","+ FORMAT +"\)"
+    a = r"(?P<variable>\w+)\s*=\s*(?P<method>\bcreate_test_bed\b)\("+ URL_LIST +r"?\)"
+    b = r"(?P<variable>\w+)\s*=\s*(?P<method>\bcreate_test_suite\b)\("+ FILE_PATH +r"(,"+ TAG_LIST +r")?\)"
+    c = r"(?P<method>\bcreate_new_project\b)\("+ TEST_SUITE +r","+ TEST_BED +r","+ PROJECT_NAME +r"\)"
+    d = r"(?P<method>\bpublish test_plan\b)\("+ TEST_SUITE +r","+ FILE_PATH +r","+ FORMAT +r"\)"
+    e = r"(?P<variable>\w+)\s*=\s*(?P<method>\bexecute\b)\("+ TEST_SUITE +r","+ TEST_BED +r"(,"+ FLAG_LIST_1 +r")?(,"+ FLAG_LIST_2 +r")?\)"
+    f = r"(?P<method>\bpublish test_results\b)\("+ TEST_SUITE +r","+ FILE_PATH +r","+ FORMAT +r"\)"
+    g = r"(?P<method>\bget_tests\b)\("+ PROJECT_NAME +r"((\,"+ TAG_LIST +r"),"+ FILTER +r")?\)"
+    h = r"(?P<method>\bget_tags\b)\("+ PROJECT_NAME +r"\)"
+    i = r"(?P<method>\bingest test_results\b)\("+ TEST_SUITE +r"\)"
+    j = r"(?P<method>\bget test_results\b)\("+ TEST_SUITE_ID +r","+ FILE_PATH +r","+ FORMAT +r"\)"
 
     def __init__(self):
         '''

@@ -22,5 +22,10 @@ class TBTAFPublisher(object):
         generator.publishTestPlan(tBTestSuiteInstance, filePath)
 
     def PublishResultReport(self, tBTestSuiteInstance, filePath, formatFlag):
+        print("Publishing result report")
+        print("File path: " + filePath)
+        print("Format flag: " + formatFlag)
+        print("Test suite instance: " + str(tBTestSuiteInstance))
+        
         generator = self._factory.create(formatFlag)
         generator.publishResultReport(tBTestSuiteInstance, filePath)
