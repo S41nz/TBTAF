@@ -165,7 +165,7 @@ class TBTAFOrchestrator(object):
 		print('Output format: ', outputFormat)
   
 		######### Linea comentada por Rommel ##########
-		# TBTAFPublisher().PublishResultReport(self._databridge.getTestResult(suiteId), resultLocation, outputFormat)
+		TBTAFPublisher().PublishResultReport(self._databridge.getTestResult(suiteId), resultLocation, outputFormat)
 		print('Test result created at: ', resultLocation)
 		
 
@@ -213,6 +213,9 @@ class TBTAFOrchestrator(object):
 			tbTestSuite = projectInstance.getTBTestSuite()
 			#vale la pena agregar excepcion si se provee lista de tags y el proyecto tiene un TBTestSuite y no smart?
 			#si el proyecto tiene ligado un TBTestSuite, como puedo usar getTestCases() de TBSmartTestSuite para filtrar por Tag. En caso que siguiente exception no deba levantarse.
+			print('test suite type: ', tbTestSuite.getTestSuiteType())
+			print('tagList: ', tagList)
+
 			if tbTestSuite.getTestSuiteType() == TBTAFTestSuiteType.NORMAL and len(tagList):
 				raise ValueError("Normal TBTestSuite not compatible with Tag list Exception")
 				print('Error: TBTAFOrchestrator.GetTests')
@@ -325,6 +328,8 @@ class TBTAFOrchestrator(object):
 		base_command = ''
 		if os_name == 'Darwin':
 			base_command = 'ping -c 1 '
+		elif os_name == 'Linux':
+			base_command = 'ping -n -w 10 '
 		else :
 			base_command = 'ping -n 1 '
 		response = subprocess.call(base_command + url, stdout = DEVNULL, stderr = DEVNULL, shell=True)

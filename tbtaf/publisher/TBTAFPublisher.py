@@ -28,4 +28,5 @@ class TBTAFPublisher(object):
         print("Test suite instance: " + str(tBTestSuiteInstance))
         
         generator = self._factory.create(formatFlag)
+        print("Generator: " + str(generator))
         generator.publishResultReport(tBTestSuiteInstance, filePath)
