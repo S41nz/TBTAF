@@ -8,6 +8,7 @@ from __future__ import print_function
 from orchestrator.TBTAFOrchestrator import TBTAFOrchestrator
 from listener.TBTAFListener import TBTAFListener
 from interpreter.TBATFInterpreterCLI import TBTAFInterpreterCLI
+from databridge.TBTAFSqliteDatabridge import TBTAFSqliteDatabridge
 import sys
 
 if __name__ == '__main__':
@@ -18,7 +19,8 @@ if __name__ == '__main__':
             
     else:
         testScript = './test/test05.tbtaf'
-        myTBTAF = TBTAFOrchestrator()
+        targetDatabridge = TBTAFSqliteDatabridge()
+        myTBTAF = TBTAFOrchestrator(targetDatabridge=targetDatabridge)
 
         print("Executing the following test script: " + testScript)
         
