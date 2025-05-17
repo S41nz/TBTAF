@@ -97,14 +97,14 @@ class TBTAFOrchestrator(object):
 	
 	#filePath - String containing the filepath where the test cases are located.
 	#tagList - Optional String containing the list of tags which are desired to be executed among the existing test code within the specified location.
-	def createTestSuite(self, filePath, tagList = None):	
+	def createTestSuite(self, filePath, tagList = None, testSuiteID = None):
 		if self.isInvalidPath(filePath):
 			print('filePath')
 			print('Error: TBTAFOrchestrator.createTestSuite')
 		else:
 			_discoverer = TBTAFDiscoverer()
 			testCaseList = _discoverer.LoadTests(filePath)
-			testSuiteID = 'testSuiteID_01'
+			testSuiteID = 'testSuiteID_' + '01' if testSuiteID is None else testSuiteID
 			
 			if tagList is None:
 				_testSuite = TBTestSuite(TBTAFTestSuiteType.NORMAL, testSuiteID)

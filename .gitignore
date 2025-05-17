@@ -5,3 +5,4 @@ adb_virt_env/
 #*.properties
 *.log
 env/
+database.db
