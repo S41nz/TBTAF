@@ -50,7 +50,7 @@ class JobResultResponse(BaseModel):
 
 class SuitesResponse(BaseModel):
     project_name: str
-    suites: Optional[Dict] = None
+    tags: Optional[Dict] = None
 
 def execute_suite_async(job_id: str, suite_name: str):
     time.sleep(5)
@@ -85,13 +85,14 @@ def execute_suite_async(job_id: str, suite_name: str):
             
             # Update progress
             progress = int((idx + 1) / total_tests * 100)
-            jobs_db[job_id].progress = progress
         
         # Simulate some delay for progress update
         time.sleep(15)
         # Final status update
         jobs_db[job_id].status = "completed"
         jobs_db[job_id].results = results
+        jobs_db[job_id].progress = progress
+
 
         print([jobs_db])
         
@@ -128,7 +129,7 @@ async def get_status(job_id: str):
     }
 
 @app.get("/api/v1/jobs", response_model=JobResultResponse)
-async def get_job_results(job_id: str, details: bool = True):
+async def get_job_results(job_id: str):
     print( "recuperando suite")
     print( [suites_db] )
     suite = suites_db[job_id]
@@ -166,14 +167,14 @@ async def get_job_results(job_id: str, details: bool = True):
 async def get_suites(request: SuitesResponse):
     try:
         if request.project_name:
-            suites = orch.getTests(request.project_name)
+            tags = orch.getTests(request.project_name)
         else:
             raise HTTPException(status_code=500, detail=f"Error retrieving suites: Must provide a project name")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving suites: {str(e)}")
     
-    print(f"Retrieved suites: {suites}")
+    print(f"Retrieved suites: {tags}")
     return {
         "project_name": request.project_name,
-        "suites": suites
+        "tags": tags
     }
