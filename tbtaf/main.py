@@ -4,56 +4,31 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from uuid import uuid4
-from typing import Dict, Optional, List
-from pydantic import BaseModel
+from typing import Dict
 import time
 from orchestrator.TBTAFOrchestrator import TBTAFOrchestrator
 from interpreter.TBTAFInterpreter import TBTAFInterpreter
 from databridge.TBTAFSqliteDatabridge import TBTAFSqliteDatabridge
+from rest.TBTAFAgentDriver import TBTAFAgentDriver
+from rest.JobResultResponse import JobResultResponse
+from rest.JobStatusResponse import JobStatusResponse
+from rest.SuitesResponse import SuitesResponse
+from rest.OperationRequest import OperationRequest
 
 app = FastAPI()
 
-# Mockup for demonstration - replace with actual TBTAF integration
-class JobStatus(BaseModel):
-    status: str  # "queued", "in_progress", "completed", "failed"
-    progress: int
-    results: Optional[List[Dict]] = None
-    suite_name: str
+# In-memory storage for jobs
+jobs_db: Dict[str, TBTAFAgentDriver] = {}
 
-
-# In-memory storage for demonstration purposes
-jobs_db: Dict[str, JobStatus] = {}
-suites_db: Dict[str, object] = {}  # Global storage for suites by job_id
-
+# In-memory storage for suites by job_id
+suites_db: Dict[str, object] = {}  
 
 targetDatabridge = TBTAFSqliteDatabridge()
 orch = TBTAFOrchestrator(targetDatabridge=targetDatabridge)
 interpreter = TBTAFInterpreter()
 
-# Pydantic models
-class OperationRequest(BaseModel):
-    suite_name: str
-    tags: Optional[List[str]] = None
-    params: Optional[Dict] = None
-
-class JobStatusResponse(BaseModel):
-    job_id: str
-    status: str
-    progress: int
-    results: Optional[List[Dict]] = None
-
-
-class JobResultResponse(BaseModel):
-    job_id: str
-    results: Optional[List[Dict]] = None
-    summary: str
-
-class SuitesResponse(BaseModel):
-    project_name: str
-    tags: Optional[Dict] = None
-
 def execute_suite_async(job_id: str, suite_name: str):
-    time.sleep(5)
+    time.sleep(1)
 
     try:
         # Get test suite from TBTAF
@@ -87,7 +62,7 @@ def execute_suite_async(job_id: str, suite_name: str):
             progress = int((idx + 1) / total_tests * 100)
         
         # Simulate some delay for progress update
-        time.sleep(15)
+        time.sleep(5)
         # Final status update
         jobs_db[job_id].status = "completed"
         jobs_db[job_id].results = results
@@ -104,7 +79,7 @@ async def create_operation(request: OperationRequest, background_tasks: Backgrou
     job_id = str(uuid4())
     
     # Initialize job
-    jobs_db[job_id] = JobStatus(
+    jobs_db[job_id] = TBTAFAgentDriver(
         status="queued",
         progress=0,
         suite_name=request.suite_name
