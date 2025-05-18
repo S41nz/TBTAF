@@ -13,7 +13,7 @@ from databridge.TBTAFOracleDatabridge import TBTAFOracleDatabridge
 from databridge.TBTAFSqliteDatabridge import TBTAFSqliteDatabridge
 
 
-class TBTAFDatabridge(Databridge):
+class TBTAFDataBridge(Databridge):
 
     def __init__(self, databridgeType: String) -> None:
         if(databridgeType == 'TBTAFOracleDatabridge'):

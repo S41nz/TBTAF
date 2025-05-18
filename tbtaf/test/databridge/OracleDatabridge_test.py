@@ -7,7 +7,7 @@ from common.metadata import TBMetadata
 from common.printable_test import TBTAFPrintableTest
 from common.result import TBTAFResult
 from common.suite import TBTestSuite
-from databridge.TBTAFDatabridge import TBTAFDatabridge
+from databridge.TBTAFDataBridge import TBTAFDataBridge
 from databridge.TBTAFOracleDatabridge import TBTAFOracleDatabridge
 from test.databridge.MockOracleConnect import MockCursor
 from test.databridge.MockOracleConnect import MockConnect
@@ -24,7 +24,7 @@ class Testing(unittest.TestCase):
         os.environ['ODB_PASS'] = "ODB_PASS" 
         os.environ['ODB_TNS'] = 'ODB_TNS'
         mock_connect.return_value = MockConnect()
-        databridge = TBTAFDatabridge('TBTAFOracleDatabridge')
+        databridge = TBTAFDataBridge('TBTAFOracleDatabridge')
         databridge.connect()
         self.assertTrue(mock_connect.called)
         mock_connect.assert_called_once_with('ODB_USER', 'ODB_PASS', 'ODB_TNS')
@@ -34,7 +34,7 @@ class Testing(unittest.TestCase):
         os.environ['ODB_PASS'] = "ODB_PASS" 
         os.environ['ODB_TNS'] = 'ODB_TNS'
         mock_connect.return_value = MockConnect()
-        databridge = TBTAFDatabridge('TBTAFOracleDatabridge')
+        databridge = TBTAFDataBridge('TBTAFOracleDatabridge')
         self.assertRaises(Exception, TBTAFOracleDatabridge.connect)
     
     @mock.patch.object(cx_Oracle, "connect")
@@ -42,7 +42,7 @@ class Testing(unittest.TestCase):
         os.environ['ODB_USER'] = "ODB_USER" 
         os.environ['ODB_TNS'] = 'ODB_TNS'
         mock_connect.return_value = MockConnect()
-        databridge = TBTAFDatabridge('TBTAFOracleDatabridge')
+        databridge = TBTAFDataBridge('TBTAFOracleDatabridge')
         self.assertRaises(Exception, TBTAFOracleDatabridge.connect)
 
     @mock.patch.object(cx_Oracle, "connect")
@@ -50,7 +50,7 @@ class Testing(unittest.TestCase):
         os.environ['ODB_USER'] = "ODB_USER" 
         os.environ['ODB_PASS'] = "ODB_PASS" 
         mock_connect.return_value = MockConnect()
-        databridge = TBTAFDatabridge('TBTAFOracleDatabridge')
+        databridge = TBTAFDataBridge('TBTAFOracleDatabridge')
         self.assertRaises(Exception, TBTAFOracleDatabridge.connect)
 
     @mock.patch.object(cx_Oracle, "connect")
@@ -60,7 +60,7 @@ class Testing(unittest.TestCase):
         os.environ['ODB_PASS'] = "ODB_PASS" 
         os.environ['ODB_TNS'] = 'ODB_TNS'
         mock_connect.return_value = MockConnect()
-        databridge = TBTAFDatabridge('TBTAFOracleDatabridge')
+        databridge = TBTAFDataBridge('TBTAFOracleDatabridge')
         databridge.connect()
         databridge.storeResult(self.createSampleTestSuite())
         self.assertTrue(mock_execute.called)
@@ -76,7 +76,7 @@ class Testing(unittest.TestCase):
         os.environ['ODB_PASS'] = "ODB_PASS" 
         os.environ['ODB_TNS'] = 'ODB_TNS'
         mock_connect.return_value = MockConnect()
-        databridge = TBTAFDatabridge('TBTAFOracleDatabridge')
+        databridge = TBTAFDataBridge('TBTAFOracleDatabridge')
         databridge.connect()
         databridge.getTestResult('1')
         mock_fetch.assert_called_once_with()

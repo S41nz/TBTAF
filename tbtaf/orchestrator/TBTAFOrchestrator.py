@@ -28,7 +28,7 @@ from interpreter.TBTAFInterpreter import TBTAFInterpreter
 from discoverer.discoverer import TBTAFDiscoverer
 from publisher.TBTAFPublisher import TBTAFPublisher
 from executor.Executor import TBTAFExecutor
-from databridge.TBTAFDataBridge import TBTAFDatabridge
+from databridge.TBTAFDataBridge import TBTAFDataBridge
 
 class TBTAFOrchestrator(object):
 	
