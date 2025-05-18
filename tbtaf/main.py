@@ -14,6 +14,7 @@ from rest.JobResultResponse import JobResultResponse
 from rest.JobStatusResponse import JobStatusResponse
 from rest.SuitesResponse import SuitesResponse
 from rest.OperationRequest import OperationRequest
+import os
 
 app = FastAPI()
 
@@ -27,12 +28,12 @@ targetDatabridge = TBTAFSqliteDatabridge()
 orch = TBTAFOrchestrator(targetDatabridge=targetDatabridge)
 interpreter = TBTAFInterpreter()
 
-def execute_suite_async(job_id: str, suite_name: str):
+def execute_suite_async(job_id: str, suite_name: str, tests_route: str):
     time.sleep(1)
 
     try:
         # Get test suite from TBTAF
-        test_suite = orch.createTestSuite("./test/discoverer/samples", testSuiteID=job_id)
+        test_suite = orch.createTestSuite(tests_route, testSuiteID=job_id)
         test_bed = orch.createTestBed()
 
         suites_db[job_id] = test_suite
@@ -47,6 +48,7 @@ def execute_suite_async(job_id: str, suite_name: str):
         # Execute suite and track progress
         results = []
         total_tests = len(test_suite.getTestCases())
+        progress = 0
         for idx, test_case in enumerate(test_suite.getTestCases()):
             # Execute test case
             test_result = test_case.execute()
@@ -85,8 +87,29 @@ async def create_operation(request: OperationRequest, background_tasks: Backgrou
         suite_name=request.suite_name
     )
     
+    # Get tests_route from request
+    tests_route = request.tests_route
+    if not tests_route:
+        tests_route = "./test/discoverer/samples"
+        print(f"Using default tests_route: {tests_route}")
+    else:
+        tests_route = request.tests_route
+        candidate_path = os.path.realpath(tests_route)
+        allowed_base = os.path.realpath("./test")
+
+        # Check for directory traversal attacks
+        # Ensure the candidate path starts with the allowed base path
+        # and does not contain ".." or "~" or start with "/"
+        if not candidate_path.startswith(allowed_base) or tests_route.find("..") != -1 or tests_route.find("~") != -1 or tests_route.startswith("/"):
+            raise HTTPException(status_code=400, detail="Invalid tests route: directory traversal detected.")
+        if not os.path.isdir(candidate_path):
+            raise HTTPException(status_code=400, detail="Invalid tests route: not a directory.")
+        tests_route = candidate_path
+
+
+
     # Start async execution
-    background_tasks.add_task(execute_suite_async, job_id, request.suite_name)
+    background_tasks.add_task(execute_suite_async, job_id, request.suite_name, tests_route=request.tests_route)
     
     return {"job_id": job_id, "status": "accepted"}
 
