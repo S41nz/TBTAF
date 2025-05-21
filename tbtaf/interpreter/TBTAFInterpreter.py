@@ -24,7 +24,7 @@ class TBTAFInterpreter(object):
 
     OrchestratorReference = None
     summary = ParsingSummary()
-    urlPattern = urlPattern = "\"(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?\""
+    urlPattern = r"\"(https?://)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*/?\""
 
     ##Params in commands
     TEST_SUITE_PARAM = "testSuite"
@@ -52,19 +52,17 @@ class TBTAFInterpreter(object):
     GET_TEST_RESULT = "get test_results"
 
     ##Patterns
-    TEST_SUITE = "(?P<"+ TEST_SUITE_PARAM +">(\w+))"
-    FILE_PATH = "\"(?P<"+ FILE_PATH_PARAM +">(.+))\""
-    TEST_BED = "(?P<"+ TEST_BED_PARAM +">(\w+))"
-    PROJECT_NAME = "\"(?P<"+ PROJECT_NAME_PARAM +">(.+))\""
-    TAG_LIST = "\[(?P<"+ TAG_LIST_PARAM +">((\"\w+\")(,\"\w+\")*))\]"
-    FILTER = "(?P<"+ FILTER_PARAM +">(\w+))"
-    FORMAT = "(?P<"+ FORMAT_PARAM +">(\w+))"
-    TEST_SUITE_ID = "(?P<"+ TEST_SUITE_ID_PARAM +">(\w+))"
-    FLAG_LIST_1 = "\[(?P<"+ FLAG_LIST_PARAM_1 +">((\w+)(,\w+)*))\]"
-    FLAG_LIST_2 = "\[(?P<"+ FLAG_LIST_PARAM_2 +">((\w+)(,\w+)*))\]"
-    ##URL_LIST = "(?P<"+ URL_LIST_PARAM +">(("+ urlPattern +")(,"+ urlPattern +")*))"
-    ##URL_LIST = "(?P<"+ URL_LIST_PARAM +">(("+ "\".+\"" +")(,"+ "\".+\"" +")*))"
-    URL_LIST = "\[(?P<"+ URL_LIST_PARAM +">(("+ "\".+\"" +")(,"+ "\".+\"" +")*))\]"
+    TEST_SUITE = r"(?P<{0}>(\w+))".format(TEST_SUITE_PARAM)
+    FILE_PATH = r"\"(?P<{0}>(.+))\"".format(FILE_PATH_PARAM)
+    TEST_BED = r"(?P<{0}>(\w+))".format(TEST_BED_PARAM)
+    PROJECT_NAME = r"\"(?P<{0}>(.+))\"".format(PROJECT_NAME_PARAM)
+    TAG_LIST = r"\[(?P<{0}>((\"\w+\")(?:,\"\w+\")*))\]".format(TAG_LIST_PARAM)
+    FILTER = r"(?P<{0}>(\w+))".format(FILTER_PARAM)
+    FORMAT = r"(?P<{0}>(\w+))".format(FORMAT_PARAM)
+    FLAG_LIST_1 = r"\[(?P<{0}>((\w+)(?:,\w+)*))\]".format(FLAG_LIST_PARAM_1)
+    FLAG_LIST_2 = r"\[(?P<{0}>((\w+)(?:,\w+)*))\]".format(FLAG_LIST_PARAM_2)
+    URL_LIST = r"\[(?P<{0}>(?:\".+?\")(?:,\".+?\")*)\]".format(URL_LIST_PARAM)
+    TEST_SUITE_ID = r"(?P<{0}>(\w+))".format(TEST_SUITE_ID_PARAM)
 
     ##Message Types
     MSG_ERROR = "Error"
@@ -74,16 +72,75 @@ class TBTAFInterpreter(object):
     FILE_LINE_NUMBER = "lineNumber"
 
     ##Patterns
-    a = "(?P<variable>\w+)\s*=\s*(?P<method>\\create_test_bed\\b)\(("+ URL_LIST +")?\)"
-    b = "(?P<variable>\w+)\s*=\s*(?P<method>\\create_test_suite\\b)\("+ FILE_PATH +"(,"+ TAG_LIST +")?\)"
-    c = "(?P<method>\\create_new_project\\b)\("+ TEST_SUITE +","+ TEST_BED +","+ PROJECT_NAME +"\)"
-    d = "(?P<method>\\publish test_plan\\b)\("+ TEST_SUITE +","+ FILE_PATH +","+ FORMAT +"\)"
-    e = "(?P<variable>\w+)\s*=\s*(?P<method>\\execute\\b)\("+ TEST_SUITE +","+ TEST_BED +"(,"+ FLAG_LIST_1 +")?(,"+ FLAG_LIST_2 +")?\)"
-    f = "(?P<method>\\publish test_results\\b)\("+ TEST_SUITE +","+ FILE_PATH +","+ FORMAT +"\)"
-    g = "(?P<method>\\get_tests\\b)\("+ PROJECT_NAME +"((\,"+ TAG_LIST +"),"+ FILTER +")?\)"
-    h = "(?P<method>\\get_tags\\b)\("+ PROJECT_NAME +"\)"
-    i = "(?P<method>\\ingest test_results\\b)\("+ TEST_SUITE +"\)"
-    j = "(?P<method>\\get test_results\\b)\("+ TEST_SUITE_ID +","+ FILE_PATH +","+ FORMAT +"\)"
+    # a = variable = create_test_bed([url_list]) 
+    a = (
+        r"(?P<variable>\w+)\s*=\s*"
+        r"(?P<method>\bcreate_test_bed\b)\("
+        r"(" + URL_LIST + r")?\)"
+    )
+
+    # b = variable = create_test_suite("file_path"[, tag_list])
+    b = (
+        r"(?P<variable>\w+)\s*=\s*"
+        r"(?P<method>\bcreate_test_suite\b)\("
+        + FILE_PATH + 
+        r"(?:\s*,\s*" + TAG_LIST + r")?\)"
+    )
+
+    # c = create_new_project(test_suite, test_bed, "project_name")
+    c = (
+        r"(?P<method>\bcreate_new_project\b)\("
+        + TEST_SUITE + r"\s*,\s*" + TEST_BED + r"\s*,\s*" + PROJECT_NAME + r"\)"
+    )
+
+    # d = publish test_plan(test_suite, "file_path", format)
+    d = (
+        r"(?P<method>\bpublish test_plan\b)\("
+        + TEST_SUITE + r"\s*,\s*" + FILE_PATH + r"\s*,\s*" + FORMAT + r"\)"
+    )
+
+    # e = variable = execute(test_suite, test_bed[, flag_list1][, flag_list2])
+    e = (
+        r"(?P<variable>\w+)\s*=\s*"
+        r"(?P<method>\bexecute\b)\("
+        + TEST_SUITE + r"\s*,\s*" + TEST_BED + 
+        r"(?:\s*,\s*" + FLAG_LIST_1 + r")?" + 
+        r"(?:\s*,\s*" + FLAG_LIST_2 + r")?\)"
+    )
+
+    # f = publish test_results(test_suite, "file_path", format)
+    f = (
+        r"(?P<method>\bpublish test_results\b)\("
+        + TEST_SUITE + r"\s*,\s*" + FILE_PATH + r"\s*,\s*" + FORMAT + r"\)"
+    )
+
+    # g = get_tests("project_name"[, tag_list], filter)
+    g = (
+        r"(?P<method>\bget_tests\b)\("
+        + PROJECT_NAME + 
+        r"(?:\s*,\s*" + TAG_LIST + r"\s*,\s*" + FILTER + r")?\)"
+    )
+
+    # h = get_tags("project_name")
+    h = (
+        r"(?P<method>\bget_tags\b)\("
+        + PROJECT_NAME + r"\)"
+    )
+
+    # i = ingest test_results(test_suite)
+    i = (
+        r"(?P<method>\bingest\b)\s*"
+        r"(?P<method>\btest_results\b)\("
+        + TEST_SUITE + r"\)"
+    )
+
+    # j = get test_results(test_suite_id, "file_path", format)
+    j = (
+        r"(?P<method>\bget\b)\s*"
+        r"(?P<method>\btest_results\b)\("
+        + TEST_SUITE_ID + r"\s*,\s*" + FILE_PATH + r"\s*,\s*" + FORMAT + r"\)"
+    )
+
 
     def __init__(self):
         '''
@@ -175,6 +232,7 @@ class TBTAFInterpreter(object):
             for command in mappingPatterns:
                 if (command in line):
                     m = re.match(mappingPatterns[command],line)
+                    print("m", m.groupdict())
                     if (m is None):
                         result.status  = TBTAFParsingScriptStatus.ERROR
                         result.message = self._formatMsg(fileName, lineNumber, "Cannot find command", TBTAFInterpreter.MSG_ERROR)

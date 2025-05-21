@@ -19,6 +19,20 @@ Update the `tbtaf_launcher.py`script to point to any of the sample `tbtaf` scrip
 Run launcher:
 > python tbtaf_launcher.py
 
+## Fastapi 
+
+After running 
+> pip install -r requirements.txt
+
+Run the development server
+> fastapi dev main.py
+
+Go to the url indicated by the log console, use the url with the /docs endpoint.
+
+e.g. http://127.0.0.1:8000/docs
+
+This will take you to the documentation page for the api with interactive endpoints.
+
 ## OracleDB configuration
 Install `Oracle Instant Client` from this [URL](https://www.oracle.com/technetwork/database/database-technologies/instant-client/downloads/index.html)
 

@@ -28,16 +28,18 @@ from interpreter.TBTAFInterpreter import TBTAFInterpreter
 from discoverer.discoverer import TBTAFDiscoverer
 from publisher.TBTAFPublisher import TBTAFPublisher
 from executor.Executor import TBTAFExecutor
-from databridge.TBTAFDataBridge import TBTAFDatabridge
+from databridge.TBTAFDataBridge import TBTAFDataBridge
 
 class TBTAFOrchestrator(object):
 	
 	INVALID_ARGUMENT_EXCEPTION_TEXT = 'Invalid Argument Exception'
 	
 	def __init__(self, nameInitizalizationFile = None,targetDatabridge = None):
-		_databridge = targetDatabridge
-		if _databridge is not None:
-			_databridge.connect()
+		print('Initializing TBTAFOrchestrator')
+		print('targetDatabridge: ', targetDatabridge)
+		self._databridge = targetDatabridge
+		if self._databridge is not None:
+			self._databridge.connect()
 		if nameInitizalizationFile is None:
 			self.projectList = []
 		else:
@@ -69,6 +71,7 @@ class TBTAFOrchestrator(object):
 	def parseScript(self, filePath):
 		_interpreter = TBTAFInterpreter()
 		_interpreter.setOrchestratorReference(self)
+		print('Parsing script: ', filePath)
 		return _interpreter.parseScript(filePath)
     
 	def createTestBed(self, urlList = ['127.0.0.1']):
@@ -94,14 +97,14 @@ class TBTAFOrchestrator(object):
 	
 	#filePath - String containing the filepath where the test cases are located.
 	#tagList - Optional String containing the list of tags which are desired to be executed among the existing test code within the specified location.
-	def createTestSuite(self, filePath, tagList = None):	
+	def createTestSuite(self, filePath, tagList = None, testSuiteID = None):
 		if self.isInvalidPath(filePath):
 			print('filePath')
 			print('Error: TBTAFOrchestrator.createTestSuite')
 		else:
 			_discoverer = TBTAFDiscoverer()
 			testCaseList = _discoverer.LoadTests(filePath)
-			testSuiteID = 'testSuiteID_01'
+			testSuiteID = 'testSuiteID_' + '01' if testSuiteID is None else testSuiteID
 			
 			if tagList is None:
 				_testSuite = TBTestSuite(TBTAFTestSuiteType.NORMAL, testSuiteID)
@@ -157,7 +160,11 @@ class TBTAFOrchestrator(object):
 	#outputFormat - Enumeration flag specifying the output format of the created result report.
 
 	def getResultReport(self, suiteId, resultLocation, outputFormat = 'html'):
-		TBTAFPublisher().PublishResultReport(self._databridge.getTestResultBySuiteId(suiteId), resultLocation, outputFormat)
+		print('Getting result report for suiteId: ', suiteId)
+		print('Result location: ', resultLocation)
+		print('Output format: ', outputFormat)
+  
+		TBTAFPublisher().PublishResultReport(self._databridge.getTestResult(suiteId), resultLocation, outputFormat)
 		print('Test result created at: ', resultLocation)
 		
 
@@ -313,9 +320,12 @@ class TBTAFOrchestrator(object):
 	def validateUrl(self, url):
 		DEVNULL = open(os.devnull, 'w')
 		os_name = platform.system()
+		print('OS Name:', os_name)
 		base_command = ''
 		if os_name == 'Darwin':
 			base_command = 'ping -c 1 '
+		elif os_name == 'Linux':
+			base_command = 'ping -n -w 10 '
 		else :
 			base_command = 'ping -n 1 '
 		response = subprocess.call(base_command + url, stdout = DEVNULL, stderr = DEVNULL, shell=True)
