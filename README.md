@@ -51,3 +51,22 @@ export ODB_TNS=<connection URL name, eg: xxxxx_medium>
 ```
 
 You are ready to connect!
+
+## GenAI Feature Configuration (Ollama)
+
+This project uses a local Large Language Model (LLM) via Ollama to generate intelligent analysis in the test reports. Follow these steps to enable this feature.
+
+1.  *Install Ollama:* Download and install Ollama for your operating system (Windows, macOS, or Linux) from the official website: [ollama.com](https://ollama.com). After installation, ensure the Ollama service is running.
+
+2.  *Pull the AI Model:* Once Ollama is running, open your terminal and pull the required model. This project is configured to use llama3.
+    bash
+    ollama pull llama3
+    
+
+3.  *Export Environment Variables:* Before running the tbtaf_launcher.py, you must set the following environment variables. These tell the framework how to connect to the Ollama service.
+    bash
+    export OLLAMA_API_URL="http://localhost:11434/api/generate"
+    export OLLAMA_MODEL="llama3"
+    
+
+After completing these steps, when you run the launcher, the GenAI features will be enabled and will enrich the PDF/HTML reports with an executive summary and failure diagnosis.

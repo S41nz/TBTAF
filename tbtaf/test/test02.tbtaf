@@ -25,6 +25,6 @@ create_new_project(myTestSuite,myTestBed,"TBTAF Smoke test project 02")
 //Execution nodes: localhost
 
 //Replace TEST_PLAN_LOCATION by the actual location on the repo for the test plan HTML
-publish test_plan(myTestSuite,"./test/discoverer/samples/SmokeTestReport.pdf",PDF)
+publish test_plan(myTestSuite,"./test/discoverer/samples/SmokeTestReport.html",HTML)
 //After the command above the following output on console is expected:
 //Test plan published at: TEST_PLAN_LOCATION

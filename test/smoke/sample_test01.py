@@ -3,7 +3,7 @@
 <TestID>1001</TestID>
 <Tags>TBTAF,Smoke</Tags>
 <Priority>1</Priority>
-<Description>Prueba Exitosa 01</Description>
+<Description>Successful Test 01</Description>
 </TBTAF>
 '''
 from __future__ import absolute_import

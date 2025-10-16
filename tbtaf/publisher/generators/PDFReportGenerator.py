@@ -6,21 +6,47 @@ Created on 04/11/2022
 from __future__ import absolute_import
 from __future__ import print_function
 import datetime
+import os
 from xhtml2pdf import pisa
 from common.exception.IllegalArgumentException import IllegalArgumentException
 from common.exception.NonSupportedFormatException import NonSupportedFormatException
 from .TBTAFReportGenerator import TBTAFReportGenerator
-from publisher.report_ai import get_report_ai
-import os
+from common.enums.verdict_type import TBTAFVerdictType
+
+from ai.AIFactory import AIFactory
+
 class PDFReportGenerator(TBTAFReportGenerator):
     '''
-    PDFReportGenerator generates all the test 
-    execution on PDF format.
+    PDFReportGenerator generates test 
+    execution reports in PDF format.
     '''
+    # Define the base path as a class attribute
+    TEST_CODE_BASE_PATH = "../test/smoke"
 
-    failed_tests_data = []
-    TEST_CODE_BASE_PATH = "../test/smoke"  # Carpeta donde están los archivos .py de las pruebas
-    class_to_filepath_cache = {}  # Un pequeño caché para no buscar el mismo archivo varias veces     
+    def _find_source_file(self, class_name, cache):
+        """
+        Helper method to find the .py file that contains a class definition.
+        It uses 'self' to access class attributes like TEST_CODE_BASE_PATH.
+        """
+        if class_name in cache:
+            return cache[class_name]
+        try:
+            for filename in os.listdir(self.TEST_CODE_BASE_PATH):
+                if filename.endswith(".py"):
+                    filepath = os.path.join(self.TEST_CODE_BASE_PATH, filename)
+                    try:
+                        with open(filepath, 'r', encoding='utf-8') as f:
+                            if f"class {class_name}" in f.read():
+                                cache[class_name] = filepath
+                                return filepath
+                    except Exception:
+                        # Ignore files that cannot be read
+                        continue
+        except Exception as e:
+            print(f"Error while searching for files in {self.TEST_CODE_BASE_PATH}: {e}")
+        
+        cache[class_name] = None
+        return None
 
     def publishTestPlan(self, tBTestSuiteInstance, filePath):
         '''
@@ -97,24 +123,20 @@ class PDFReportGenerator(TBTAFReportGenerator):
         pisa.CreatePDF(htmlString, dest=htmlFile)
         htmlFile.close()
 
+
     def publishResultReport(self, tBTestSuiteInstance, filePath):
         '''
-        Builds a test execution report on a PDF format
-        based on the execution result of a given test suite
+        Builds a test execution report and enriches it with AI analysis.
         '''
-        
         if not filePath.lower().endswith(".pdf"):
-            print("The file path doesn't contain a valid pdf file")
-            raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
-
+            raise NonSupportedFormatException("File must be .pdf")
 
         try:
             htmlFile = open(filePath, 'w+b')
         except IOError:
-            print("Invalid file path")
-            raise IllegalArgumentException("IllegalArgumentException in filePath argument in PublishTestPlan")
+            raise IllegalArgumentException("Invalid file path")
         
-        #Read HTML Template file and put into a string
+         #Read HTML Template file and put into a string
         htmlTemplate = open('publisher/results_template.html','r')
         htmlString = htmlTemplate.read()
         htmlTemplate.close()
@@ -195,115 +217,101 @@ class PDFReportGenerator(TBTAFReportGenerator):
 
         #Calculate report time
         reportTime = datetime.datetime.now()
-        s_reportTime = reportTime.strftime('%B %d,%Y %H:%M:%S')                  
-       
-        # =============== INICIO DE LA IMPLEMENTACIÓN DE IA ===============
+        s_reportTime = reportTime.strftime('%B %d,%Y %H:%M:%S')
+                    
+        # ========== START: INTEGRATION WITH THE AI FACTORY ==========       
+        
+        ai_interface = None
+        try:
+            # CHANGE: Use the factory to get the AI interface.
+            # This generator no longer knows that "Ollama" exists.
+            ai_interface = AIFactory.create_ai_interface("ollama")
+        except ValueError as e:
+            print(f"Warning: Could not initialize AI interface: {e}")
 
-        # --- FASE 1: RECUPERACIÓN (RETRIEVAL) ---        
-        # Recuperamos el código fuente de las pruebas que fallaron.
+        # --- PHASE 1: RETRIEVAL ---
         failed_tests_data = []
+        class_to_filepath_cache = {} # Cache per report execution for efficiency
         for testCase in testCasesList:
             testResult = testCase.getResult()
-            print("veredicto "+testResult.getVerdict())        
-            if testResult.getVerdict() == "Failed":
+            if testResult.getVerdict().strip() == TBTAFVerdictType.FAIL:
                 class_name = testResult.getResultSource()
-                source_file_path = self.find_source_file(class_name, self.TEST_CODE_BASE_PATH)
+                # Call the helper method using 'self'
+                source_file_path = self._find_source_file(class_name, class_to_filepath_cache)
+                
                 test_code = ""
-                try:
-                    with open(source_file_path, 'r', encoding='utf-8') as code_file:
-                        test_code = code_file.read()
-                except IOError as e:
-                    test_code = f"Error: No se pudo leer el archivo de código en {source_file_path}."
-                    print(f"Error al leer el archivo de código: {e}")
+                if source_file_path:
+                    try:
+                        with open(source_file_path, 'r', encoding='utf-8') as code_file:
+                            test_code = code_file.read()
+                    except IOError as e:
+                        test_code = f"Error reading file: {e}. Path: '{source_file_path}'"
+                else:
+                    test_code = f"Error: Could not find the .py file for class '{class_name}' in '{self.TEST_CODE_BASE_PATH}'."
                 
                 failed_tests_data.append({
                     "description": testCase.getTestMetadata().getAssetDescription(),
                     "code": test_code
                 })
 
-        # --- FASE 2: GENERACIÓN AUMENTADA (AUGMENTED GENERATION) ---
-        ai_summary = ""
+        # --- PHASE 2: AUGMENTED GENERATION ---
+        ai_summary = "AI analysis was not available for this execution."
         ai_diagnostics = []
 
-        # 2.1 - Generar el Resumen General
-        descriptions = [tc.getTestMetadata().getAssetDescription() for tc in testCasesList]
-        prompt_summary = f"""
-        Actúa como un analista de QA. El siguiente es un reporte de una suite de pruebas:
-        - Tasa de Éxito: {s_successRate}%
-        - Pruebas Ejecutadas: {totalTests}
-        - Pruebas Pasadas: {summaryTestSuite.passTests}
-        - Pruebas Falladas: {summaryTestSuite.failedTests}
-        - Descripciones de las pruebas: {', '.join(descriptions)}
+        # Only proceed if the AI interface was successfully initialized
+        if ai_interface:
+            # 2.1 - Generate Executive Summary
+            descriptions = [tc.getTestMetadata().getAssetDescription() for tc in testCasesList]
+            prompt_summary = f"""
+            Act as a QA Analyst. The following is a test suite report summary:
+            - Success Rate: {s_successRate}%
+            - Total Tests: {totalTests}
+            - Passed Tests: {summaryTestSuite.passTests}
+            - Failed Tests: {summaryTestSuite.failedTests}
+            - Test Descriptions: {', '.join(descriptions)}
 
-        Genera un resumen ejecutivo de máximo 60 palabras sobre la cobertura funcional y el resultado general de la suite.
-        """
-        ai_summary = get_report_ai(prompt_summary)
+            Generate a concise executive summary (max 60 words) about the functional coverage and overall result of this suite.
+            """
+            # CHANGE: Use the standardized interface method
+            ai_summary = ai_interface.send_prompt(prompt_summary)
 
-        # 2.2 - Generar el Diagnóstico para cada fallo
-        if failed_tests_data: # Solo si hay pruebas fallidas
-            for failed_test in failed_tests_data:
-                prompt_diag = f"""
-                Actúa como un desarrollador senior experto en depuración. La prueba llamada '{failed_test['description']}' ha fallado.
-                Basado únicamente en su código fuente, proporciona un diagnóstico técnico inicial sobre la posible causa del fallo en menos de 50 palabras en español.
-                Código de la prueba:
-                ```python
-                {failed_test['code']}
-                ```
-                """
-                diagnosis = get_report_ai(prompt_diag)
-                ai_diagnostics.append(f"<b>Diagnóstico para '{failed_test['description']}':</b> {diagnosis}")
-        
-        # ================= FIN DE LA IMPLEMENTACIÓN DE IA ================      
+            # 2.2 - Generate Diagnostics for each failed test
+            if failed_tests_data:
+                for failed_test in failed_tests_data:
+                    prompt_diag = f"""
+                    Act as a senior developer and an expert in debugging. The test named '{failed_test['description']}' has failed.
+                    Based solely on its source code, provide an initial technical diagnosis of the likely cause of failure in under 50 words.
+                    Test Code:
+                    ```python
+                    {failed_test['code']}
+                    ```
+                    """
+                    # CHANGE: Use the standardized interface method
+                    diagnosis = ai_interface.send_prompt(prompt_diag)
+                    ai_diagnostics.append(f"<b>Diagnosis for '{failed_test['description']}':</b> {diagnosis}")                
 
-        #Replace the html string with summary results
-        htmlString = htmlString.replace('r_suite',str(tBTestSuiteInstance.getSuiteID()))
-        htmlString = htmlString.replace('r_total_tests',str(totalTests))
-        htmlString = htmlString.replace('r_passed',str(summaryTestSuite.passTests))
-        htmlString = htmlString.replace('r_failed',str(summaryTestSuite.failedTests))
-        htmlString = htmlString.replace('r_inconclusive',str(summaryTestSuite.inconclusiveTests))
-        htmlString = htmlString.replace('r_success_rate',s_successRate + '%')
-        htmlString = htmlString.replace('r_start_time',s_startTime)
-        htmlString = htmlString.replace('r_end_time',s_endTime)
-        htmlString = htmlString.replace('r_elapsed_time',s_elapsedTime)
-        htmlString = htmlString.replace('r_overview',s_overview)
-        htmlString = htmlString.replace('r_report_time',s_reportTime)             
+        htmlString = htmlString.replace('r_suite', str(tBTestSuiteInstance.getSuiteID()))
+        htmlString = htmlString.replace('r_total_tests', str(totalTests))
+        htmlString = htmlString.replace('r_passed', str(summaryTestSuite.passTests))
+        htmlString = htmlString.replace('r_failed', str(summaryTestSuite.failedTests))
+        htmlString = htmlString.replace('r_inconclusive', str(summaryTestSuite.inconclusiveTests))
+        htmlString = htmlString.replace('r_success_rate', s_successRate + '%')
+        htmlString = htmlString.replace('r_start_time', s_startTime)
+        htmlString = htmlString.replace('r_end_time', s_endTime)
+        htmlString = htmlString.replace('r_elapsed_time', s_elapsedTime)
+        htmlString = htmlString.replace('r_overview', s_overview)
+        htmlString = htmlString.replace('r_report_time', s_reportTime)
 
-        # --- AÑADIR LOS NUEVOS REEMPLAZOS PARA LA IA ---
+        # Replace AI placeholders
         htmlString = htmlString.replace('r_ai_summary', ai_summary)
-        
-        # Formatear la lista de diagnósticos para mostrarla bien en HTML
         if ai_diagnostics:
             formatted_diagnostics = "".join([f"<p>{d}</p>" for d in ai_diagnostics])
             htmlString = htmlString.replace('r_ai_diagnostics', formatted_diagnostics)
         else:
-            htmlString = htmlString.replace('r_ai_diagnostics', "<p>No se encontraron pruebas fallidas.</p>")    
-        
+            htmlString = htmlString.replace('r_ai_diagnostics', "<p>No failed tests were found to analyze.</p>")
+
         headTagIndex = htmlString.index("</head>")
         htmlString = htmlString[:headTagIndex] + "<style> @page {size: a4 landscape;margin: 2cm;} .table th {text-align: left;} </style>" + htmlString[headTagIndex:]
         pisa.CreatePDF(htmlString, dest=htmlFile)
-        htmlFile.close()    
-    
-    def find_source_file(self, class_name, base_path):
-        """
-        Busca en una carpeta el archivo .py que contiene la definición de una clase.
-        """
-        if class_name in self.class_to_filepath_cache:
-            return self.class_to_filepath_cache[class_name]
+        htmlFile.close()
 
-        try:
-            for filename in os.listdir(base_path):
-                if filename.endswith(".py"):
-                    filepath = os.path.join(base_path, filename)
-                    try:
-                        with open(filepath, 'r', encoding='utf-8') as f:
-                            if f"class {class_name}" in f.read():
-                                self.class_to_filepath_cache[class_name] = filepath
-                                return filepath
-                    except Exception:
-                        # Ignorar archivos que no se puedan leer
-                        continue
-        except Exception as e:
-            print(f"Error al buscar archivos en la carpeta {base_path}: {e}")
-        
-        self.class_to_filepath_cache[class_name] = None
-        return None
