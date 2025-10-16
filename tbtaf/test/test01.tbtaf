@@ -24,9 +24,9 @@ create_new_project(myTestSuite,myTestBed,"TBTAF Smoke test project 01")
 //Number of tests: <Number of contained tests>
 //Execution nodes: localhost
 
-get_tags("TBTAF Smoke test project 01")
+get_tags("TBTAF Smoke test project 0111")
 //I should get listed all the tags contained in the test content of the created test suite
 
 //Replace TEST_TAG by one of the tags contained on the created test suite
-get_tests("TBTAF Smoke test project 01",["TBTAF"],IN)
+get_tests("TBTAF Smoke test project 0111",["TBTAF"],IN)
 //After the command above its expected to display the list of all the test IDs that contained the requested tag above

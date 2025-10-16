@@ -1,9 +1,9 @@
 '''
 <TBTAF>
-<TestID>1004</TestID>
+<TestID>1008</TestID>
 <Tags>TBTAF,Smoke</Tags>
 <Priority>4</Priority>
-<Description>Prueba Exitosa 04</Description>
+<Description>Prueba fallida 02</Description>
 </TBTAF>
 '''
 from __future__ import absolute_import
@@ -20,9 +20,7 @@ import time
 class TBTAFSampleTest(TBTestCase):
     '''
     classdocs
-    '''
-
-    
+    '''    
         
     def __init__(self):
         '''
@@ -45,7 +43,7 @@ class TBTAFSampleTest(TBTestCase):
         time.sleep(7)
         TBTestCase.execute(self)
         print("Execute performed from TBTAFSampleTest")
-        self.testResult = TBTAFResult(TBTAFVerdictType.PASS,"TBTAFSampleTest")
+        self.testResult = TBTAFResult(TBTAFVerdictType.FAIL,"TBTAFSampleTest")
 
 
     def cleanup(self):

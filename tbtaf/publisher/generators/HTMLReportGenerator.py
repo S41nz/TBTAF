@@ -9,11 +9,17 @@ import datetime
 from common.exception.IllegalArgumentException import IllegalArgumentException
 from common.exception.NonSupportedFormatException import NonSupportedFormatException
 from .TBTAFReportGenerator import TBTAFReportGenerator
+from publisher.report_ai import get_report_ai
+import os
 class HTMLReportGenerator(TBTAFReportGenerator):
     '''
     HTMLReportGenerator generates all the test 
     execution on HTML format.
     '''
+
+    failed_tests_data = []
+    TEST_CODE_BASE_PATH = "../test/smoke"  # Carpeta donde están los archivos .py de las pruebas
+    class_to_filepath_cache = {}  # Un pequeño caché para no buscar el mismo archivo varias veces     
 
     def publishTestPlan(self, tBTestSuiteInstance, filePath):
         '''
@@ -184,6 +190,64 @@ class HTMLReportGenerator(TBTAFReportGenerator):
             #Add close table row tag to HTML
             s_overview = s_overview + "</tr>"
 
+        # =============== INICIO DE LA IMPLEMENTACIÓN DE IA ===============
+
+        # --- FASE 1: RECUPERACIÓN (RETRIEVAL) ---        
+        # Recuperamos el código fuente de las pruebas que fallaron.
+        failed_tests_data = []
+        for testCase in testCasesList:
+            testResult = testCase.getResult()
+            print("veredicto "+testResult.getVerdict())        
+            if testResult.getVerdict() == "Failed":
+                class_name = testResult.getResultSource()
+                source_file_path = self.find_source_file(class_name, self.TEST_CODE_BASE_PATH)
+                test_code = ""
+                try:
+                    with open(source_file_path, 'r', encoding='utf-8') as code_file:
+                        test_code = code_file.read()
+                except IOError as e:
+                    test_code = f"Error: No se pudo leer el archivo de código en {source_file_path}."
+                    print(f"Error al leer el archivo de código: {e}")
+                
+                failed_tests_data.append({
+                    "description": testCase.getTestMetadata().getAssetDescription(),
+                    "code": test_code
+                })
+
+        # --- FASE 2: GENERACIÓN AUMENTADA (AUGMENTED GENERATION) ---
+        ai_summary = ""
+        ai_diagnostics = []
+
+        # 2.1 - Generar el Resumen General
+        descriptions = [tc.getTestMetadata().getAssetDescription() for tc in testCasesList]
+        prompt_summary = f"""
+        Actúa como un analista de QA. El siguiente es un reporte de una suite de pruebas:
+        - Tasa de Éxito: {s_successRate}%
+        - Pruebas Ejecutadas: {totalTests}
+        - Pruebas Pasadas: {summaryTestSuite.passTests}
+        - Pruebas Falladas: {summaryTestSuite.failedTests}
+        - Descripciones de las pruebas: {', '.join(descriptions)}
+
+        Genera un resumen ejecutivo de máximo 60 palabras sobre la cobertura funcional y el resultado general de la suite.
+        """
+        ai_summary = get_report_ai(prompt_summary)
+
+        # 2.2 - Generar el Diagnóstico para cada fallo
+        if failed_tests_data: # Solo si hay pruebas fallidas
+            for failed_test in failed_tests_data:
+                prompt_diag = f"""
+                Actúa como un desarrollador senior experto en depuración. La prueba llamada '{failed_test['description']}' ha fallado.
+                Basado únicamente en su código fuente, proporciona un diagnóstico técnico inicial sobre la posible causa del fallo en menos de 50 palabras en español.
+                Código de la prueba:
+                ```python
+                {failed_test['code']}
+                ```
+                """
+                diagnosis = get_report_ai(prompt_diag)
+                ai_diagnostics.append(f"<b>Diagnóstico para '{failed_test['description']}':</b> {diagnosis}")
+        
+        # ================= FIN DE LA IMPLEMENTACIÓN DE IA ================ 
+
         #Calculate report time
         reportTime = datetime.datetime.now()
         s_reportTime = reportTime.strftime('%B %d,%Y %H:%M:%S')
@@ -200,6 +264,41 @@ class HTMLReportGenerator(TBTAFReportGenerator):
         htmlString = htmlString.replace('r_elapsed_time',s_elapsedTime)
         htmlString = htmlString.replace('r_overview',s_overview)
         htmlString = htmlString.replace('r_report_time',s_reportTime)
+
+        # --- AÑADIR LOS NUEVOS REEMPLAZOS PARA LA IA ---
+        htmlString = htmlString.replace('r_ai_summary', ai_summary)
+        
+        # Formatear la lista de diagnósticos para mostrarla bien en HTML
+        if ai_diagnostics:
+            formatted_diagnostics = "".join([f"<p>{d}</p>" for d in ai_diagnostics])
+            htmlString = htmlString.replace('r_ai_diagnostics', formatted_diagnostics)
+        else:
+            htmlString = htmlString.replace('r_ai_diagnostics', "<p>No se encontraron pruebas fallidas.</p>")    
         
         htmlFile.write(htmlString)
         htmlFile.close()
+
+    def find_source_file(self, class_name, base_path):
+        """
+        Busca en una carpeta el archivo .py que contiene la definición de una clase.
+        """
+        if class_name in self.class_to_filepath_cache:
+            return self.class_to_filepath_cache[class_name]
+
+        try:
+            for filename in os.listdir(base_path):
+                if filename.endswith(".py"):
+                    filepath = os.path.join(base_path, filename)
+                    try:
+                        with open(filepath, 'r', encoding='utf-8') as f:
+                            if f"class {class_name}" in f.read():
+                                self.class_to_filepath_cache[class_name] = filepath
+                                return filepath
+                    except Exception:
+                        # Ignorar archivos que no se puedan leer
+                        continue
+        except Exception as e:
+            print(f"Error al buscar archivos en la carpeta {base_path}: {e}")
+        
+        self.class_to_filepath_cache[class_name] = None
+        return None
