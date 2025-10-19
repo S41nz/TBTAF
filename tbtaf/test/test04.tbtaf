@@ -28,7 +28,7 @@ myResult = execute(myTestSuite,myTestBed)
 //Executing: <Test ID> Progress: [0-100%]
 
 //Replace TEST_RESULT_LOCATION by the actual location on the repo for the test result of the test execution
-publish test_results(myTestSuite,"./test/discoverer/samples/SmokeResultReport.html",HTML)
+publish test_results(myTestSuite,"./test/discoverer/samples/SmokeResultReport.pdf",PDF)
 //After the command above the following output on console is expected:
 //Test result created at: TEST_RESULT_LOCATION
 ingest test_results(myTestSuite)

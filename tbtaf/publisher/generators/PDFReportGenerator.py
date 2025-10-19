@@ -6,16 +6,17 @@ Created on 04/11/2022
 from __future__ import absolute_import
 from __future__ import print_function
 import datetime
+import os
 from xhtml2pdf import pisa
 from common.exception.IllegalArgumentException import IllegalArgumentException
 from common.exception.NonSupportedFormatException import NonSupportedFormatException
-from .TBTAFReportGenerator import TBTAFReportGenerator
-class PDFReportGenerator(TBTAFReportGenerator):
-    '''
-    PDFReportGenerator generates all the test 
-    execution on PDF format.
-    '''
+from .RAGBasedReportGenerator import RAGBasedReportGenerator
 
+class PDFReportGenerator(RAGBasedReportGenerator):
+    '''
+    PDFReportGenerator generates test 
+    execution reports in PDF format.
+    '''
     def publishTestPlan(self, tBTestSuiteInstance, filePath):
         '''
         Builds a test plan specification on a PDF format
@@ -91,24 +92,20 @@ class PDFReportGenerator(TBTAFReportGenerator):
         pisa.CreatePDF(htmlString, dest=htmlFile)
         htmlFile.close()
 
+
     def publishResultReport(self, tBTestSuiteInstance, filePath):
         '''
-        Builds a test execution report on a PDF format
-        based on the execution result of a given test suite
+        Builds a test execution report and enriches it with AI analysis.
         '''
-        
         if not filePath.lower().endswith(".pdf"):
-            print("The file path doesn't contain a valid pdf file")
-            raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
-
+            raise NonSupportedFormatException("File must be .pdf")
 
         try:
             htmlFile = open(filePath, 'w+b')
         except IOError:
-            print("Invalid file path")
-            raise IllegalArgumentException("IllegalArgumentException in filePath argument in PublishTestPlan")
+            raise IllegalArgumentException("Invalid file path")
         
-        #Read HTML Template file and put into a string
+         #Read HTML Template file and put into a string
         htmlTemplate = open('publisher/results_template.html','r')
         htmlString = htmlTemplate.read()
         htmlTemplate.close()
@@ -190,21 +187,31 @@ class PDFReportGenerator(TBTAFReportGenerator):
         #Calculate report time
         reportTime = datetime.datetime.now()
         s_reportTime = reportTime.strftime('%B %d,%Y %H:%M:%S')
+                    
+        ai_summary, ai_diagnostics = self._perform_ai_analysis(testCasesList, summaryTestSuite, s_successRate, totalTests)
 
-        #Replace the html string with summary results
-        htmlString = htmlString.replace('r_suite',str(tBTestSuiteInstance.getSuiteID()))
-        htmlString = htmlString.replace('r_total_tests',str(totalTests))
-        htmlString = htmlString.replace('r_passed',str(summaryTestSuite.passTests))
-        htmlString = htmlString.replace('r_failed',str(summaryTestSuite.failedTests))
-        htmlString = htmlString.replace('r_inconclusive',str(summaryTestSuite.inconclusiveTests))
-        htmlString = htmlString.replace('r_success_rate',s_successRate + '%')
-        htmlString = htmlString.replace('r_start_time',s_startTime)
-        htmlString = htmlString.replace('r_end_time',s_endTime)
-        htmlString = htmlString.replace('r_elapsed_time',s_elapsedTime)
-        htmlString = htmlString.replace('r_overview',s_overview)
-        htmlString = htmlString.replace('r_report_time',s_reportTime)
-        
+        htmlString = htmlString.replace('r_suite', str(tBTestSuiteInstance.getSuiteID()))
+        htmlString = htmlString.replace('r_total_tests', str(totalTests))
+        htmlString = htmlString.replace('r_passed', str(summaryTestSuite.passTests))
+        htmlString = htmlString.replace('r_failed', str(summaryTestSuite.failedTests))
+        htmlString = htmlString.replace('r_inconclusive', str(summaryTestSuite.inconclusiveTests))
+        htmlString = htmlString.replace('r_success_rate', s_successRate + '%')
+        htmlString = htmlString.replace('r_start_time', s_startTime)
+        htmlString = htmlString.replace('r_end_time', s_endTime)
+        htmlString = htmlString.replace('r_elapsed_time', s_elapsedTime)
+        htmlString = htmlString.replace('r_overview', s_overview)
+        htmlString = htmlString.replace('r_report_time', s_reportTime)
+
+        # Replace AI placeholders
+        htmlString = htmlString.replace('r_ai_summary', ai_summary)
+        if ai_diagnostics:
+            formatted_diagnostics = "".join([f"<p>{d}</p>" for d in ai_diagnostics])
+            htmlString = htmlString.replace('r_ai_diagnostics', formatted_diagnostics)
+        else:
+            htmlString = htmlString.replace('r_ai_diagnostics', "<p>No failed tests were found to analyze.</p>")
+
         headTagIndex = htmlString.index("</head>")
         htmlString = htmlString[:headTagIndex] + "<style> @page {size: a4 landscape;margin: 2cm;} .table th {text-align: left;} </style>" + htmlString[headTagIndex:]
         pisa.CreatePDF(htmlString, dest=htmlFile)
         htmlFile.close()
+

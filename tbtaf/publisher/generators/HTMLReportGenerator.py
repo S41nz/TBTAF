@@ -8,12 +8,13 @@ from __future__ import print_function
 import datetime
 from common.exception.IllegalArgumentException import IllegalArgumentException
 from common.exception.NonSupportedFormatException import NonSupportedFormatException
-from .TBTAFReportGenerator import TBTAFReportGenerator
-class HTMLReportGenerator(TBTAFReportGenerator):
+from .RAGBasedReportGenerator import RAGBasedReportGenerator
+
+class HTMLReportGenerator(RAGBasedReportGenerator):
     '''
     HTMLReportGenerator generates all the test 
     execution on HTML format.
-    '''
+    '''    
 
     def publishTestPlan(self, tBTestSuiteInstance, filePath):
         '''
@@ -91,13 +92,13 @@ class HTMLReportGenerator(TBTAFReportGenerator):
     def publishResultReport(self, tBTestSuiteInstance, filePath):
         '''
         Builds a test execution report on a HTML format
-        based on the execution result of a given test suite
+        based on the execution result of a given test suite 
+        nd enriches it with AI analysis
         '''
         
         if not filePath.lower().endswith(".html"):
             print("The file path doesn't contain a valid html file")
             raise NonSupportedFormatException("NonSupportedFormatException in PublishTestPlan")
-
 
         try:
             htmlFile = open(filePath, 'w+')
@@ -184,6 +185,8 @@ class HTMLReportGenerator(TBTAFReportGenerator):
             #Add close table row tag to HTML
             s_overview = s_overview + "</tr>"
 
+        ai_summary, ai_diagnostics = self._perform_ai_analysis(testCasesList, summaryTestSuite, s_successRate, totalTests)
+
         #Calculate report time
         reportTime = datetime.datetime.now()
         s_reportTime = reportTime.strftime('%B %d,%Y %H:%M:%S')
@@ -201,5 +204,12 @@ class HTMLReportGenerator(TBTAFReportGenerator):
         htmlString = htmlString.replace('r_overview',s_overview)
         htmlString = htmlString.replace('r_report_time',s_reportTime)
         
+       # Replace AI placeholders
+        htmlString = htmlString.replace('r_ai_summary', ai_summary)
+        if ai_diagnostics:
+            formatted_diagnostics = "".join([f"<p>{d}</p>" for d in ai_diagnostics])
+            htmlString = htmlString.replace('r_ai_diagnostics', formatted_diagnostics)
+        else:
+            htmlString = htmlString.replace('r_ai_diagnostics', "<p>No failed tests were found to analyze.</p>")
         htmlFile.write(htmlString)
-        htmlFile.close()
+        htmlFile.close()    
