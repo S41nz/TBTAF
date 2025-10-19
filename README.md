@@ -67,6 +67,6 @@ This project uses a local Large Language Model (LLM) via Ollama to generate inte
     bash
     export OLLAMA_API_URL="http://localhost:11434/api/generate"
     export OLLAMA_MODEL="llama3"
-    
+    export TEST_CODE_BASE_PATH="../test/smoke"
 
 After completing these steps, when you run the launcher, the GenAI features will be enabled and will enrich the PDF/HTML reports with an executive summary and failure diagnosis.
