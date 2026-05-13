@@ -10,7 +10,7 @@ from mcp.server.fastmcp import FastMCP
 from mcp.types import TextContent
 
 
-BASE_URL = "http://localhost:8000/api/v1"
+BASE_TBTAF_URL = "http://localhost:8000/api/v1"
 
 mcp = FastMCP("TBTAF")
 
